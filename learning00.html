@@ -1312,8 +1312,7 @@
     currentSkillId = id;
     videoWatched = false;  // 重置影片觀看狀態
 
-    const startTime = new Date();
-    window.skillStartTime = startTime;
+    window.skillStartTime = new Date();
     
     // 隱藏歡迎訊息
     document.getElementById('welcomeMessage').style.display = 'none';
@@ -1378,18 +1377,18 @@
     //呼叫 API 記錄開始學習
     if (currentUser) {
         makeRequest({
-        action: 'saveProgress',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        skillId: id,
-        skillName: skills[id].name,
-        startTime: startTime.toLocaleString('zh-TW'),
-        status: 'started',
-        attempts: 1
+            action: 'saveProgress',
+            userId: currentUser.userId,
+            email: currentUser.email,
+            skillId: id,
+            skillName: skills[id].name,
+            startTime: startTime.toLocaleString('zh-TW'),
+            status: 'started',
+            attempts: 1
         }).then(() => {
-        console.log('✅ 已記錄開始學習');
+            console.log('✅ 已記錄開始學習');
         }).catch(err => {
-        console.error('❌ 記錄失敗:', err);
+            console.error('❌ 記錄失敗:', err);
         });
     }
     }
