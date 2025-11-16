@@ -317,7 +317,16 @@
         <div class="project-content">
           <div class="project-title">App Inventor 遊戲製作</div>
           <div class="project-desc">從零開始打造屬於你的互動遊戲，逐步學習程式邏輯與介面設計。</div>
-          <button class="project-btn" onclick="enterMainProject()">開始學習</button>
+          <button class="project-btn" onclick="enterProject('appinventor')">開始學習</button>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-cover" style="background-image: url('https://placehold.co/600x400?text=App+Inventor');"></div>
+        <div class="project-content">
+          <div class="project-title">Scratch 遊戲製作</div>
+          <div class="project-desc">從零開始打造屬於你的互動遊戲，逐步學習程式邏輯與介面設計。</div>
+          <button class="project-btn" onclick="enterProject('scratch')">開始學習</button>
         </div>
       </div>
     </div>
@@ -365,20 +374,17 @@
         }
     }
     
-    function enterMainProject() {
-        // 檢查是否已登入
-        const currentUser = localStorage.getItem('currentUser');
-        if (!currentUser) {
+    function enterProject(projectId) {
+    // 檢查是否已登入
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
         alert('請先登入才能開始學習！');
         window.location.href = 'login.html';
         return;
-        }
-        window.location.href = "learning00.html";
     }
-
-
-    function enterMainProject() {
-      window.location.href = "learning00.html";
+    
+    // 跳轉到學習頁面,帶上專案 ID
+    window.location.href = `learning.html?project=${projectId}`;
     }
   </script>
 </body>
