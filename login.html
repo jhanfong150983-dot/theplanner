@@ -8,60 +8,126 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 背景裝飾 */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      top: -200px;
+      right: -200px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      bottom: -150px;
+      left: -150px;
+      animation: float 8s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
     }
 
     .login-container {
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 450px;
+      border-radius: 30px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+      max-width: 420px;
       width: 100%;
-      padding: 50px 40px;
+      padding: 60px 40px;
       text-align: center;
-      animation: slideIn 0.5s ease-out;
+      animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      z-index: 1;
     }
 
     @keyframes slideIn {
       from {
         opacity: 0;
-        transform: translateY(-30px);
+        transform: translateY(-50px) scale(0.9);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
       }
     }
 
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
+    /* 吉祥物區域 */
+    .mascot-container {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+
+    .mascot {
+      width: 100%;
+      height: 100%;
       background: linear-gradient(135deg, #667eea, #764ba2);
-      border-radius: 20px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
+      font-size: 70px;
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      animation: bounce 2s ease-in-out infinite;
+      position: relative;
+    }
+
+    .mascot::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 3px solid rgba(102, 126, 234, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.15); opacity: 0; }
     }
 
     .login-title {
       font-size: 32px;
-      font-weight: bold;
+      font-weight: 700;
       color: #333;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
     }
 
     .login-subtitle {
       font-size: 16px;
-      color: #666;
+      color: #888;
       margin-bottom: 40px;
+      line-height: 1.5;
     }
 
     .google-login-wrapper {
@@ -71,88 +137,75 @@
       min-height: 50px;
     }
 
-    .divider {
-      display: flex;
-      align-items: center;
-      margin: 30px 0;
-      color: #999;
-      font-size: 14px;
-    }
-
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #e0e0e0;
-    }
-
-    .divider::before {
-      margin-right: 10px;
-    }
-
-    .divider::after {
-      margin-left: 10px;
-    }
-
-    .features {
-      text-align: left;
+    .quick-info {
+      background: linear-gradient(135deg, #f5f7ff 0%, #fef5ff 100%);
+      border-radius: 15px;
+      padding: 20px;
       margin-bottom: 30px;
     }
 
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 15px;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .feature-icon {
-      width: 24px;
-      height: 24px;
-      background: #f0f4ff;
-      border-radius: 50%;
+    .info-item {
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
+      color: #666;
       font-size: 14px;
+      margin: 8px 0;
+    }
+
+    .info-icon {
+      font-size: 18px;
     }
 
     .back-link {
       color: #667eea;
       text-decoration: none;
       font-size: 14px;
+      font-weight: 600;
       transition: all 0.3s;
-      display: inline-block;
-      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .back-link:hover {
       color: #764ba2;
-      text-decoration: underline;
+      transform: translateX(-3px);
     }
 
     .loading {
       display: none;
-      margin-top: 20px;
-      color: #666;
-      font-size: 14px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
     }
 
     .loading.active {
-      display: block;
+      display: flex;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
     }
 
     .spinner {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #667eea;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 50px;
+      height: 50px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 10px;
+      margin: 0 auto 20px;
     }
 
     @keyframes spin {
@@ -160,81 +213,103 @@
       100% { transform: rotate(360deg); }
     }
 
+    .loading-text {
+      color: #333;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
     .error-message {
       display: none;
       background: #fee;
-      border: 1px solid #fcc;
+      border-left: 4px solid #f44;
       color: #c33;
-      padding: 12px;
+      padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
       font-size: 14px;
+      text-align: left;
     }
 
     .error-message.active {
       display: block;
+      animation: shake 0.5s;
     }
 
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    /* 響應式 */
     @media (max-width: 480px) {
       .login-container {
-        padding: 40px 30px;
+        padding: 50px 30px;
       }
       .login-title {
-        font-size: 26px;
+        font-size: 28px;
+      }
+      .mascot-container {
+        width: 120px;
+        height: 120px;
+      }
+      .mascot {
+        font-size: 60px;
       }
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <!-- Logo -->
-    <div class="logo">🎓</div>
+    <!-- 吉祥物 -->
+    <div class="mascot-container">
+      <div class="mascot">
+        <img src="assets/mascot.png" alt="PBL 吉祥物" style="width: 80%; height: 80%; object-fit: contain;" onerror="this.parentElement.innerHTML='🎓'">
+      </div>
+    </div>
     
     <!-- 標題 -->
-    <h1 class="login-title">歡迎回來!</h1>
-    <p class="login-subtitle">使用 Google 帳號快速登入</p>
+    <h1 class="login-title">開始你的學習之旅</h1>
+    <p class="login-subtitle">使用 Google 帳號即可快速登入/註冊</p>
     
-    <!-- Google 登入按鈕容器 (修正) -->
+    <!-- Google 登入按鈕 -->
     <div class="google-login-wrapper">
-      <!-- Google 自動載入配置 -->
       <div id="g_id_onload"
            data-client_id="337555990444-q69o7nufa9rmumi33nsggdcump0su9hb.apps.googleusercontent.com"
            data-callback="handleCredentialResponse"
            data-auto_prompt="false">
       </div>
-      <!-- 實際按鈕渲染位置 -->
       <div id="google-button"></div>
     </div>
     
     <!-- 錯誤訊息 -->
     <div class="error-message" id="errorMessage"></div>
     
-    <!-- 分隔線 -->
-    <div class="divider">或</div>
-    
-    <!-- 平台特色 -->
-    <div class="features">
-      <div class="feature-item">
-        <div class="feature-icon">🎮</div>
-        <span>遊戲化學習體驗</span>
+    <!-- 快速說明 -->
+    <div class="quick-info">
+      <div class="info-item">
+        <span class="info-icon">✨</span>
+        <span>首次登入自動完成註冊</span>
       </div>
-      <div class="feature-item">
-        <div class="feature-icon">📊</div>
-        <span>即時追蹤學習進度</span>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">🏆</div>
-        <span>解鎖成就與徽章</span>
+      <div class="info-item">
+        <span class="info-icon">🔒</span>
+        <span>安全快速,無需記憶密碼</span>
       </div>
     </div>
     
     <!-- 返回首頁 -->
-    <a href="index.html" class="back-link">← 返回首頁</a>
-    
-    <!-- 載入狀態 -->
-    <div class="loading" id="loadingState">
+    <a href="index.html" class="back-link">
+      <span>←</span>
+      <span>返回首頁</span>
+    </a>
+  </div>
+
+  <!-- 載入狀態 -->
+  <div class="loading" id="loadingState">
+    <div class="loading-content">
       <div class="spinner"></div>
-      <p>登入中...</p>
+      <p class="loading-text">正在登入中...</p>
     </div>
   </div>
 
@@ -243,6 +318,31 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAQ3VMxGxTq2hAy9UkyUX0jlQuW9wgPIOIwbkb8pQfLsNxHj9XVbduF9PWB3IMijXn/exec';
     
     console.log('使用的 API 網址:', SCRIPT_URL);
+    
+    // 顯示錯誤訊息
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.classList.add('active');
+      setTimeout(() => {
+        errorDiv.classList.remove('active');
+      }, 5000);
+    }
+    
+    // 解析 JWT Token
+    function parseJwt(token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
+          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+        ).join(''));
+        return JSON.parse(jsonPayload);
+      } catch (e) {
+        console.error('JWT 解析失敗:', e);
+        return null;
+      }
+    }
     
     // 使用 JSONP 方式發送請求 (繞過 CORS)
     function makeRequest(data) {
@@ -292,31 +392,6 @@
           }
         }, 15000);
       });
-    }
-    
-    // 顯示錯誤訊息
-    function showError(message) {
-      const errorDiv = document.getElementById('errorMessage');
-      errorDiv.textContent = message;
-      errorDiv.classList.add('active');
-      setTimeout(() => {
-        errorDiv.classList.remove('active');
-      }, 5000);
-    }
-    
-    // 解析 JWT Token
-    function parseJwt(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
-          '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-        ).join(''));
-        return JSON.parse(jsonPayload);
-      } catch (e) {
-        console.error('JWT 解析失敗:', e);
-        return null;
-      }
     }
     
     // Google 登入回調函數
@@ -395,7 +470,7 @@
             localStorage.setItem('currentUser', JSON.stringify(userData));
             
             // 跳轉到首頁
-            alert(`歡迎加入,${name}!🎉`);
+            alert(`🎉 歡迎加入 PBL 自主學習平台,${name}!`);
             window.location.href = 'index.html';
           } else {
             showError('註冊失敗,請稍後再試');
@@ -434,7 +509,6 @@
       if (typeof google !== 'undefined' && google.accounts) {
         initializeGoogleLogin();
       } else {
-        // 如果還沒載入,等待一下再試
         setTimeout(() => {
           if (typeof google !== 'undefined' && google.accounts) {
             initializeGoogleLogin();
@@ -448,22 +522,20 @@
     // 初始化 Google 登入
     function initializeGoogleLogin() {
       try {
-        // 初始化 Google Identity Services
         google.accounts.id.initialize({
           client_id: '337555990444-q69o7nufa9rmumi33nsggdcump0su9hb.apps.googleusercontent.com',
           callback: handleCredentialResponse,
           auto_select: false
         });
         
-        // 渲染登入按鈕到正確的容器
         google.accounts.id.renderButton(
-          document.getElementById('google-button'),  // ✅ 正確的按鈕容器
+          document.getElementById('google-button'),
           { 
             theme: 'outline', 
             size: 'large',
             text: 'signin_with',
             locale: 'zh_TW',
-            width: 250
+            width: 280
           }
         );
         
