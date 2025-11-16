@@ -128,6 +128,12 @@
       padding: 30px 20px;
       position: relative;
       image-rendering: pixelated;
+      opacity: 0; /* 🔥 預設隱藏 */
+      transition: opacity 0.5s ease; /* 🔥 淡入效果 */
+    }
+
+    .skill-tree-section.loaded {
+      opacity: 1; /* 🔥 載入完成後顯示 */
     }
 
     /* 右側內容區域 */
@@ -892,9 +898,77 @@
         opacity: 0;
     }
     }
+
+        /* 載入遮罩 */
+    .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+    }
+
+    .loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    }
+
+    .loading-spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    border-top: 8px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+    margin-top: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    animation: pulse-text 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+    }
+
+    .loading-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 30px;
+    animation: float-logo 2s ease-in-out infinite;
+    }
+
+    @keyframes float-logo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    }
+
   </style>
 </head>
 <body>
+    <!-- 🔥 載入遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <img src="assets/logo.png" alt="Logo" class="loading-logo" 
+            onerror="this.style.display='none'">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">載入學習進度中...</div>
+    </div>
     <header>
     <nav class="nav-left">
         <a href="index.html" class="logo-link">
@@ -1894,9 +1968,21 @@
         console.error('❌ 載入進度失敗:', err);
         }
     }
+    // 🔥 顯示技能樹
+    setTimeout(() => {
+        document.querySelector('.skill-tree-section').classList.add('loaded');
+    }, 200);
     
-    // 等待技能樹渲染完成後繪製連接線
-    setTimeout(() => drawConnections(), 200);
+    // 🔥 移除載入遮罩
+    setTimeout(() => {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+        loadingOverlay.classList.add('fade-out');
+        setTimeout(() => loadingOverlay.remove(), 500);
+        }
+    }, 500);
+    
+    setTimeout(() => drawConnections(), 600);
     };
 
     // 更新 Header UI
