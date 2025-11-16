@@ -1382,7 +1382,7 @@
             email: currentUser.email,
             skillId: id,
             skillName: skills[id].name,
-            startTime: startTime.toLocaleString('zh-TW'),
+            startTime: window.skillStartTime.toLocaleString('zh-TW'),
             status: 'started',
             attempts: 1
         }).then(() => {
