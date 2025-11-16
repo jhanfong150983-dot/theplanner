@@ -1077,7 +1077,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLFE5c5m2Y4rAr3H6eIlPF06UhQK6n4IY0iLIl8jTSzXxdCxWxhK5eE9C4DLefn-IN/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4H6gGKlT_9R79uO6rbtUY_3p25kEM3gzwJ-5iXLbgXK8ixEJvZ5Xs_Qywqj2GEr5I/exec';
 
     // 取得當前登入使用者
     let currentUser = null;
@@ -1386,9 +1386,13 @@
             email: currentUser.email,
             skillId: id,
             skillName: skills[id].name,
+            skillType: skills[id].type,  // ✅ 前端直接傳送
             startTime: window.skillStartTime.toLocaleString('zh-TW'),
             status: 'started',
-            attempts: 1
+            attempts: 1,
+            completeTime: '',  // 🔥 開始時為空
+            score: '',         // 🔥 開始時為空
+            learningMinutes: 0 // 🔥 開始時為 0
         }).then(() => {
             console.log('✅ 已記錄開始學習');
         }).catch(err => {
