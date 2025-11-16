@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>App Inventor 遊戲製作 - 技能樹</title>
+  <title>THE PLANNER 學習網</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -915,7 +915,7 @@
   <div class="main-container">
     <!-- 左側：技能樹 -->
     <div class="skill-tree-section">
-      <div class="tree-title">🎮 App Inventor 技能樹</div>
+      <div class="tree-title"> App Inventor 遊戲製作</div>
       
       <!-- SVG 連接線 -->
       <svg class="connections-svg" id="connectionsSvg"></svg>
@@ -1077,6 +1077,56 @@
   </div>
 
   <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAQ3VMxGxTq2hAy9UkyUX0jlQuW9wgPIOIwbkb8pQfLsNxHj9XVbduF9PWB3IMijXn/exec';
+
+    // 取得當前登入使用者
+    let currentUser = null;
+    try {
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+        currentUser = JSON.parse(userData);
+    }
+    } catch (e) {
+    console.error('讀取使用者失敗:', e);
+    }
+
+    // 複製登入頁面的 makeRequest 函數
+    function makeRequest(data) {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        
+        window[callbackName] = function(response) {
+        console.log('API 回應:', response);
+        delete window[callbackName];
+        if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+        resolve(response);
+        };
+        
+        const params = new URLSearchParams({
+        callback: callbackName,
+        ...data
+        });
+        
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        script.onerror = () => {
+        delete window[callbackName];
+        reject(new Error('請求失敗'));
+        };
+        
+        document.body.appendChild(script);
+        
+        setTimeout(() => {
+        if (window[callbackName]) {
+            delete window[callbackName];
+            reject(new Error('請求超時'));
+        }
+        }, 15000);
+    });
+    }
+
     // 技能資料
     const skills = {
       1: { 
@@ -1261,6 +1311,9 @@
     
     currentSkillId = id;
     videoWatched = false;  // 重置影片觀看狀態
+
+    const startTime = new Date();
+    window.skillStartTime = startTime;
     
     // 隱藏歡迎訊息
     document.getElementById('welcomeMessage').style.display = 'none';
@@ -1283,7 +1336,7 @@
     document.getElementById('contentSection').scrollTop = 0;
     }
 
-    // 新增：載入 YouTube 影片函數
+    // 載入 YouTube 影片函數
     function loadYouTubeVideo(id) {
     const videoContainer = document.querySelector('.video-container');
     const skill = skills[id];
@@ -1322,9 +1375,26 @@
         videoWatched = true;
         updateContinueButton();
     }
+    //呼叫 API 記錄開始學習
+    if (currentUser) {
+        makeRequest({
+        action: 'saveProgress',
+        userId: currentUser.userId,
+        email: currentUser.email,
+        skillId: id,
+        skillName: skills[id].name,
+        startTime: startTime.toLocaleString('zh-TW'),
+        status: 'started',
+        attempts: 1
+        }).then(() => {
+        console.log('✅ 已記錄開始學習');
+        }).catch(err => {
+        console.error('❌ 記錄失敗:', err);
+        });
+    }
     }
 
-    // 新增：更新繼續按鈕狀態
+    // 更新繼續按鈕狀態
     function updateContinueButton() {
     const continueBtn = document.querySelector('.continue-btn');
     if (videoWatched) {
@@ -1342,6 +1412,24 @@
     if (!videoWatched) {
         alert('請先觀看完教學影片！');
         return;
+    }
+
+    if (currentUser && window.skillStartTime) {
+    const watchDuration = Math.floor((new Date() - window.skillStartTime) / 1000); // 秒數
+    
+    makeRequest({
+      action: 'saveVideoWatch',
+      userId: currentUser.userId,
+      email: currentUser.email,
+      videoId: currentSkillId,
+      videoTitle: skills[currentSkillId].name,
+      watchDuration: watchDuration,
+      totalDuration: watchDuration  // 如果知道影片總長度可以改成實際值
+    }).then(() => {
+      console.log('✅ 已記錄影片觀看');
+    }).catch(err => {
+      console.error('❌ 記錄失敗:', err);
+    });
     }
 
     // 停止 YouTube 影片
@@ -1436,7 +1524,25 @@
     });
 
     const percentage = (correctCount / quiz.length) * 100;
-    
+
+    // 記錄測驗結果
+    if (currentUser) {
+        makeRequest({
+        action: 'saveQuizResult',
+        userId: currentUser.userId,
+        email: currentUser.email,
+        quizId: currentSkillId,
+        quizName: skills[currentSkillId].name,
+        score: Math.round(percentage),
+        totalQuestions: quiz.length,
+        correctAnswers: correctCount
+        }).then(() => {
+        console.log('✅ 已記錄測驗結果');
+        }).catch(err => {
+        console.error('❌ 記錄失敗:', err);
+        });
+    }
+
     if (percentage === 100) {
         // 顯示成功懸浮視窗
         showSuccessModal();
@@ -1645,6 +1751,36 @@
       circle.classList.add('completed');
       completedSkills.add(currentSkillId);
       
+    // 記錄完成課程並更新統計
+    if (currentUser && window.skillStartTime) {
+        const completeTime = new Date();
+        const learningMinutes = Math.floor((completeTime - window.skillStartTime) / 60000);
+
+        // 更新進度為完成
+        makeRequest({
+        action: 'saveProgress',
+        userId: currentUser.userId,
+        email: currentUser.email,
+        skillId: currentSkillId,
+        skillName: skills[currentSkillId].name,
+        startTime: window.skillStartTime.toLocaleString('zh-TW'),
+        completeTime: completeTime.toLocaleString('zh-TW'),
+        status: 'completed',
+        score: 100
+        }).then(() => {
+        console.log('✅ 已記錄完成狀態');
+        });
+        
+        // 更新使用者統計
+        makeRequest({
+        action: 'updateUserStats',
+        userId: currentUser.userId,
+        completedCourse: 'true',
+        learningMinutes: learningMinutes
+        }).then(() => {
+        console.log('✅ 已更新使用者統計');
+        });
+    }
       // 解鎖下一個技能
       unlockNextSkills(currentSkillId);
       
