@@ -239,8 +239,60 @@
   </div>
 
   <script>
-    // Google Apps Script API 網址
+    // Google Apps Script API 網址 (請確認這是最新部署的網址)
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAQ3VMxGxTq2hAy9UkyUX0jlQuW9wgPIOIwbkb8pQfLsNxHj9XVbduF9PWB3IMijXn/exec';
+    
+    console.log('使用的 API 網址:', SCRIPT_URL);
+    
+    // 使用 JSONP 方式發送請求 (繞過 CORS)
+    function makeRequest(data) {
+      return new Promise((resolve, reject) => {
+        // 創建唯一的回調函數名稱
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        
+        // 將回調函數掛載到 window
+        window[callbackName] = function(response) {
+          console.log('JSONP 回應:', response);
+          delete window[callbackName];
+          if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          resolve(response);
+        };
+        
+        // 構建 URL 參數
+        const params = new URLSearchParams({
+          callback: callbackName,
+          ...data
+        });
+        
+        // 創建 script 標籤
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        script.onerror = (error) => {
+          console.error('JSONP 載入失敗:', error);
+          delete window[callbackName];
+          if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          reject(new Error('請求失敗'));
+        };
+        
+        document.body.appendChild(script);
+        
+        // 超時處理 (15秒)
+        setTimeout(() => {
+          if (window[callbackName]) {
+            console.error('JSONP 請求超時');
+            delete window[callbackName];
+            if (script && script.parentNode) {
+              script.parentNode.removeChild(script);
+            }
+            reject(new Error('請求超時,請稍後再試'));
+          }
+        }, 15000);
+      });
+    }
     
     // 顯示錯誤訊息
     function showError(message) {
@@ -290,24 +342,17 @@
         
         console.log('Google 登入成功:', { email, name });
         
-        // 檢查使用者是否已註冊
-        const checkResponse = await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            action: 'checkUser',
-            email: email
-          })
+        // 使用 JSONP 方式檢查使用者
+        console.log('開始檢查使用者...');
+        const checkData = await makeRequest({
+          action: 'checkUser',
+          email: email
         });
-        
-        const checkData = await checkResponse.json();
         console.log('檢查使用者回應:', checkData);
         
-        if (checkData.data && checkData.data.exists) {
+        if (checkData.success && checkData.data && checkData.data.exists) {
           // 已註冊使用者
+          console.log('使用者已存在,準備登入...');
           const userData = {
             userId: checkData.data.userId,
             email: email,
@@ -327,21 +372,13 @@
         } else {
           // 新使用者,註冊
           console.log('新使用者,開始註冊...');
-          const registerResponse = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'cors',
-            headers: { 
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              action: 'registerUser',
-              email: email,
-              name: name,
-              avatar: avatar
-            })
+          const registerData = await makeRequest({
+            action: 'registerUser',
+            email: email,
+            name: name,
+            displayName: name,
+            avatar: avatar
           });
-          
-          const registerData = await registerResponse.json();
           console.log('註冊回應:', registerData);
           
           if (registerData.success) {
