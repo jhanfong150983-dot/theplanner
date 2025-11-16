@@ -895,22 +895,22 @@
   </style>
 </head>
 <body>
-  <!-- Header - 從 index 複製 -->
-  <header>
+    <header>
     <nav class="nav-left">
-      <a href="index.html" class="logo-link">
+        <a href="index.html" class="logo-link">
         <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto; image-rendering:pixelated;" onerror="this.style.display='none'">
-      </a>
-      <button class="nav-btn" onclick="location.href='index.html'">主線任務</button>
-      <button class="nav-btn">支線任務</button>
-      <button class="nav-btn">學習紀錄</button>
+        </a>
+        <button class="nav-btn" onclick="location.href='index.html'">主線任務</button>
+        <button class="nav-btn">支線任務</button>
+        <button class="nav-btn">學習紀錄</button>
     </nav>
 
-    <div class="nav-right">
-      <button class="auth-btn register-btn">註冊</button>
-      <button class="auth-btn login-btn">登入</button>
+    <!-- 🔥 加入 id="headerNav" -->
+    <div class="nav-right" id="headerNav">
+        <button class="auth-btn register-btn">註冊</button>
+        <button class="auth-btn login-btn">登入</button>
     </div>
-  </header>
+    </header>
 
   <div class="main-container">
     <!-- 左側：技能樹 -->
@@ -1085,9 +1085,12 @@
     const userData = localStorage.getItem('currentUser');
     if (userData) {
         currentUser = JSON.parse(userData);
+        console.log('✅ 讀取到使用者:', currentUser);  // 🔥 加入除錯訊息
+    } else {
+        console.log('⚠️ localStorage 中沒有 currentUser');
     }
     } catch (e) {
-    console.error('讀取使用者失敗:', e);
+    console.error('❌ 讀取使用者失敗:', e);
     }
 
     // 複製登入頁面的 makeRequest 函數
@@ -1845,15 +1848,15 @@
     return required.every(id => completedSkills.has(id));
     }
 
-    // 頁面載入時恢復進度
+// 頁面載入時恢復進度
     window.onload = async function() {
     console.log('頁面載入完成');
     
-    // 檢查登入狀態
+    // 🔥 先更新 UI
     if (currentUser) {
-        updateHeaderUI();
+        updateHeaderUI();  // 立即更新 Header 顯示
         
-        // 🔥 載入使用者的學習進度
+        // 再載入學習進度
         try {
         const progressData = await makeRequest({
             action: 'getUserProgress',
@@ -1888,11 +1891,6 @@
         }
     }
     
-    // 初始化技能樹 (如果還沒有的話)
-    if (!document.querySelector('.skill-tree').children.length) {
-        initSkillTree(); // 如果你有這個函數
-    }
-    
     // 等待技能樹渲染完成後繪製連接線
     setTimeout(() => drawConnections(), 200);
     };
@@ -1900,11 +1898,25 @@
     // 更新 Header UI
     function updateHeaderUI() {
     if (currentUser) {
-        document.getElementById('headerNav').innerHTML = `
-        <img src="${currentUser.avatar}" style="width:40px; height:40px; border-radius:50%; border:2px solid white;">
-        <span style="color:white; font-weight:bold;">${currentUser.displayName}</span>
-        <button class="nav-btn" onclick="logout()">登出</button>
+        const navRight = document.getElementById('headerNav');
+        if (navRight) {
+        navRight.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="${currentUser.avatar}" alt="avatar" 
+                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
+            <div style="color: white; text-align: left;">
+                <div style="font-weight: bold; font-size: 14px;">${currentUser.displayName}</div>
+                <div style="font-size: 11px; opacity: 0.85;">完成 ${currentUser.completedCourses || 0} 課程</div>
+            </div>
+            <button class="nav-btn" onclick="logout()" 
+                    style="background: rgba(255,255,255,0.1); color: white;">
+                登出
+            </button>
+            </div>
         `;
+        } else {
+        console.error('❌ 找不到 headerNav 元素');
+        }
     }
     }
 
