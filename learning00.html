@@ -1206,6 +1206,7 @@
     let currentSkillId = null;
     let userAnswers = [];
     let completedSkills = new Set();
+    let currentAttempts = 1;  // 🔥 新增:追蹤當前技能的嘗試次數
 
     // 繪製連接線
     function drawConnections() {
@@ -1311,8 +1312,8 @@
     
     currentSkillId = id;
     videoWatched = false;  // 重置影片觀看狀態
-
     window.skillStartTime = new Date();
+    currentAttempts = 1;
     
     // 隱藏歡迎訊息
     document.getElementById('welcomeMessage').style.display = 'none';
@@ -1546,6 +1547,8 @@
         // 顯示成功懸浮視窗
         showSuccessModal();
     } else {
+        currentAttempts++;
+        console.log(`嘗試次數: ${currentAttempts}`);
         showFailModal(percentage);
     }
     
@@ -1757,15 +1760,18 @@
 
         // 更新進度為完成
         makeRequest({
-        action: 'saveProgress',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        skillId: currentSkillId,
-        skillName: skills[currentSkillId].name,
-        startTime: window.skillStartTime.toLocaleString('zh-TW'),
-        completeTime: completeTime.toLocaleString('zh-TW'),
-        status: 'completed',
-        score: 100
+            action: 'saveProgress',
+            userId: currentUser.userId,
+            email: currentUser.email,
+            skillId: currentSkillId,
+            skillName: skills[currentSkillId].name,
+            skillType: skills[currentSkillId].type,
+            startTime: window.skillStartTime.toLocaleString('zh-TW'),
+            completeTime: completeTime.toLocaleString('zh-TW'),
+            status: 'completed',
+            score: 100,
+            attempts: currentAttempts,
+            learningMinutes: learningMinutes
         }).then(() => {
         console.log('✅ 已記錄完成狀態');
         });
@@ -1838,6 +1844,77 @@
     const required = prerequisites[skillId] || [];
     return required.every(id => completedSkills.has(id));
     }
+
+    // 頁面載入時恢復進度
+    window.onload = async function() {
+    console.log('頁面載入完成');
+    
+    // 檢查登入狀態
+    if (currentUser) {
+        updateHeaderUI();
+        
+        // 🔥 載入使用者的學習進度
+        try {
+        const progressData = await makeRequest({
+            action: 'getUserProgress',
+            userId: currentUser.userId
+        });
+        
+        if (progressData.success && progressData.data.completedSkills) {
+            const completed = progressData.data.completedSkills;
+            console.log('✅ 已完成的技能:', completed);
+            
+            // 恢復已完成狀態
+            completed.forEach(skillId => {
+            completedSkills.add(skillId);
+            const node = document.querySelector(`[data-id="${skillId}"]`);
+            if (node) {
+                const circle = node.querySelector('.skill-circle');
+                circle.classList.remove('locked', 'available');
+                circle.classList.add('completed');
+            }
+            });
+            
+            // 解鎖下一個技能
+            completed.forEach(skillId => {
+            unlockNextSkills(skillId);
+            });
+            
+            // 重新繪製連接線
+            setTimeout(() => drawConnections(), 200);
+        }
+        } catch (err) {
+        console.error('❌ 載入進度失敗:', err);
+        }
+    }
+    
+    // 初始化技能樹 (如果還沒有的話)
+    if (!document.querySelector('.skill-tree').children.length) {
+        initSkillTree(); // 如果你有這個函數
+    }
+    
+    // 等待技能樹渲染完成後繪製連接線
+    setTimeout(() => drawConnections(), 200);
+    };
+
+    // 更新 Header UI
+    function updateHeaderUI() {
+    if (currentUser) {
+        document.getElementById('headerNav').innerHTML = `
+        <img src="${currentUser.avatar}" style="width:40px; height:40px; border-radius:50%; border:2px solid white;">
+        <span style="color:white; font-weight:bold;">${currentUser.displayName}</span>
+        <button class="nav-btn" onclick="logout()">登出</button>
+        `;
+    }
+    }
+
+    function logout() {
+    if (confirm('確定要登出嗎?')) {
+        localStorage.removeItem('currentUser');
+        location.href = 'index.html';
+    }
+    }
+
   </script>
 </body>
 </html>
