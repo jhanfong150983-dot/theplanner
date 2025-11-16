@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Inventor 遊戲製作 - 技能樹</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      margin: 0; 
+      font-family: Arial, Helvetica, sans-serif; 
+      background: #f5f7fa;
+      overflow-x: hidden;
+    }
+    
+    /* Header 樣式 - 從 index 複製 */
+    header {
+      background: #4a6cf7;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nav-left {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .logo-link {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .nav-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    
+    /* 導覽列按鈕樣式 */
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.85);
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .nav-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 註冊/登入按鈕 */
+    .auth-btn {
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .register-btn {
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.8);
+    }
+    .register-btn:hover {
+      background: white;
+      color: #4a6cf7;
+      border-color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .login-btn {
+      background: white;
+      color: #4a6cf7;
+    }
+    .login-btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .auth-btn:active {
+      transform: translateY(0);
+    }
+
+    /* 主容器 - 左右分割 */
+    .main-container {
+      display: flex;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+    }
+
+    /* 左側技能樹區域 */
+    .skill-tree-section {
+      flex: 0 0 50%;
+      background: 
+        repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, 0.05) 0px,
+          rgba(0, 0, 0, 0.05) 2px,
+          transparent 2px,
+          transparent 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          rgba(0, 0, 0, 0.05) 0px,
+          rgba(0, 0, 0, 0.05) 2px,
+          transparent 2px,
+          transparent 4px
+        ),
+        linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      overflow-y: auto;
+      padding: 30px 20px;
+      position: relative;
+      image-rendering: pixelated;
+    }
+
+    /* 右側內容區域 */
+    .content-section {
+      flex: 0 0 50%;
+      background: white;
+      overflow-y: auto;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tree-title {
+      text-align: center;
+      color: #ffd700;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-shadow: 
+        2px 2px 0px #8b4513,
+        -1px -1px 0px rgba(0,0,0,0.5),
+        0 0 20px rgba(255, 215, 0, 0.5);
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+    }
+
+    /* SVG 連接線容器 */
+    .connections-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 技能樹 - 從下往上 */
+    .skill-tree {
+      position: relative;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 100px;
+      z-index: 2;
+      padding-bottom: 30px;
+    }
+
+    .skill-layer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* 主線居中 */
+    .mainline {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 支線包含主線+側邊支線 */
+    .sideline-layer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 180px;
+    }
+
+    .side-branches {
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    /* 技能節點 */
+    .skill-node {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 主線技能圓圈 - 較大 */
+    .skill-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.3),
+        0 8px 20px rgba(0,0,0,0.6),
+        inset 0 2px 10px rgba(255,255,255,0.3);
+      border: 6px solid transparent;
+      position: relative;
+      font-size: 13px;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      line-height: 1.2;
+      font-family: 'Courier New', monospace;
+      text-shadow: 
+        1px 1px 0 rgba(0,0,0,0.8),
+        -1px -1px 0 rgba(0,0,0,0.8);
+      image-rendering: pixelated;
+    }
+
+    /* 八位元風格邊框效果 */
+    .skill-circle::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.1);
+      pointer-events: none;
+    }
+
+    /* 支線技能圓圈 - 較小 */
+    .skill-circle.side {
+      width: 90px;
+      height: 90px;
+      font-size: 11px;
+      padding: 8px;
+      border-width: 5px;
+    }
+
+    /* 鎖定狀態 - 石頭質感 */
+    .skill-circle.locked {
+      background: 
+        linear-gradient(135deg, 
+          #4a5568 0%, 
+          #2d3748 25%,
+          #4a5568 50%,
+          #2d3748 75%,
+          #4a5568 100%);
+      background-size: 200% 200%;
+      cursor: not-allowed;
+      opacity: 0.7;
+      border-color: #1a202c;
+      box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.5),
+        0 6px 15px rgba(0,0,0,0.7),
+        inset 0 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .skill-circle.locked::after {
+      content: '🔒';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      opacity: 0.6;
+      filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8));
+    }
+
+    /* 主線可用狀態 - 金色寶箱風格 */
+    .skill-circle.available {
+      background: 
+        linear-gradient(135deg, 
+          #ffd700 0%, 
+          #ffed4e 20%,
+          #ffd700 40%,
+          #f4a742 60%,
+          #ffd700 80%,
+          #ffed4e 100%);
+      background-size: 200% 200%;
+      border-color: #ffed4e;
+      animation: shine-main 3s ease-in-out infinite, pulse-main 2s infinite;
+      box-shadow: 
+        0 0 0 4px rgba(139, 69, 19, 0.8),
+        0 0 20px rgba(255, 215, 0, 0.8),
+        0 8px 25px rgba(0,0,0,0.6),
+        inset 0 2px 10px rgba(255,255,255,0.5);
+    }
+
+    /* 支線可用狀態 - 紫色魔法風格 */
+    .skill-circle.side.available {
+      background: 
+        linear-gradient(135deg, 
+          #9333ea 0%, 
+          #c084fc 25%,
+          #a855f7 50%,
+          #7c3aed 75%,
+          #9333ea 100%);
+      background-size: 200% 200%;
+      border-color: #c084fc;
+      animation: shine-side 3s ease-in-out infinite, pulse-side 2s infinite;
+      box-shadow: 
+        0 0 0 4px rgba(88, 28, 135, 0.8),
+        0 0 20px rgba(168, 85, 247, 0.8),
+        0 6px 20px rgba(0,0,0,0.6),
+        inset 0 2px 10px rgba(255,255,255,0.3);
+    }
+
+    /* 主線已完成 - 閃亮金色 */
+    .skill-circle.completed {
+      background: 
+        radial-gradient(circle at 30% 30%, 
+          #fff9c4 0%,
+          #ffd700 30%,
+          #f4a742 70%,
+          #d4a017 100%);
+      border-color: #fff9c4;
+      box-shadow: 
+        0 0 0 4px rgba(139, 69, 19, 0.9),
+        0 0 30px rgba(255, 215, 0, 1),
+        0 8px 25px rgba(0,0,0,0.6),
+        inset 0 2px 15px rgba(255,255,255,0.7);
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    .skill-circle.completed::after {
+      content: '✓';
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 32px;
+      height: 32px;
+      background: radial-gradient(circle, #10b981 0%, #059669 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      border: 3px solid #d1fae5;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+    }
+
+    /* 支線已完成 - 閃亮紫色 */
+    .skill-circle.side.completed {
+      background: 
+        radial-gradient(circle at 30% 30%, 
+          #e9d5ff 0%,
+          #c084fc 30%,
+          #9333ea 70%,
+          #6b21a8 100%);
+      border-color: #e9d5ff;
+      box-shadow: 
+        0 0 0 4px rgba(88, 28, 135, 0.9),
+        0 0 25px rgba(168, 85, 247, 1),
+        0 6px 20px rgba(0,0,0,0.6),
+        inset 0 2px 15px rgba(255,255,255,0.5);
+      animation: sparkle 2s ease-in-out infinite;
+    }
+
+    .skill-circle.side.completed::after {
+      width: 28px;
+      height: 28px;
+      font-size: 18px;
+    }
+
+    .skill-circle:not(.locked):hover {
+      transform: scale(1.2) translateY(-8px) rotate(5deg);
+      box-shadow: 
+        0 0 0 4px rgba(0, 0, 0, 0.3),
+        0 12px 40px rgba(255, 215, 0, 0.8),
+        0 0 50px rgba(255, 215, 0, 0.6);
+      filter: brightness(1.2);
+    }
+
+    @keyframes pulse-main {
+      0%, 100% { 
+        box-shadow: 
+          0 0 0 4px rgba(139, 69, 19, 0.8),
+          0 0 20px rgba(255, 215, 0, 0.6),
+          0 8px 25px rgba(0,0,0,0.6);
+      }
+      50% { 
+        box-shadow: 
+          0 0 0 4px rgba(139, 69, 19, 0.8),
+          0 0 35px rgba(255, 215, 0, 1),
+          0 10px 30px rgba(0,0,0,0.6);
+      }
+    }
+
+    @keyframes pulse-side {
+      0%, 100% { 
+        box-shadow: 
+          0 0 0 4px rgba(88, 28, 135, 0.8),
+          0 0 20px rgba(168, 85, 247, 0.6),
+          0 6px 20px rgba(0,0,0,0.6);
+      }
+      50% { 
+        box-shadow: 
+          0 0 0 4px rgba(88, 28, 135, 0.8),
+          0 0 35px rgba(168, 85, 247, 1),
+          0 8px 25px rgba(0,0,0,0.6);
+      }
+    }
+
+    @keyframes shine-main {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes shine-side {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes sparkle {
+      0%, 100% { 
+        filter: brightness(1) drop-shadow(0 0 5px rgba(255,255,255,0.5)); 
+      }
+      50% { 
+        filter: brightness(1.3) drop-shadow(0 0 15px rgba(255,255,255,0.8)); 
+      }
+    }
+
+    /* 右側內容區域 */
+    .content-header {
+      margin-bottom: 25px;
+    }
+
+    .content-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .content-subtitle {
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    /* 初始提示 */
+    .welcome-message {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .welcome-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+
+    .welcome-text {
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    /* 影片區域 */
+    .video-container {
+      background: #000;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      aspect-ratio: 16/9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 18px;
+    }
+
+    .video-placeholder {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .continue-btn {
+      background: #4a6cf7;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .continue-btn:hover {
+      background: #3b5ad6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(74, 108, 247, 0.3);
+    }
+
+    /* 評量介面 */
+    .quiz-container {
+      display: none;
+      flex: 1;
+    }
+
+    .quiz-container.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question {
+      margin-bottom: 25px;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #1f2937;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      background: #f9fafb;
+      border: 2px solid #e5e7eb;
+      padding: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .option:hover {
+      border-color: #4a6cf7;
+      background: #eff6ff;
+    }
+
+    .option.selected {
+      border-color: #4a6cf7;
+      background: #dbeafe;
+    }
+
+    .option.correct {
+      border-color: #10b981;
+      background: #d1fae5;
+    }
+
+    .option.wrong {
+      border-color: #ef4444;
+      background: #fee2e2;
+    }
+
+    .submit-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 20px;
+    }
+
+    .submit-btn:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .submit-btn:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .result-message {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .result-message.success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .result-message.fail {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* 圖例 */
+    .legend {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 100;
+    }
+
+    .legend-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .legend-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      flex-shrink: 0;
+    }
+
+    .legend-circle.main {
+      width: 28px;
+      height: 28px;
+      border-width: 3px;
+    }
+
+    .legend-circle.locked { 
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      border-color: #9ca3af;
+      opacity: 0.5;
+    }
+    .legend-circle.main.available { 
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      border-color: #fde047;
+    }
+    .legend-circle.side.available { 
+      background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+      border-color: #c084fc;
+    }
+    .legend-circle.main.completed { 
+      background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+      border-color: #fef08a;
+    }
+    .legend-circle.side.completed { 
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+      border-color: #e9d5ff;
+    }
+
+    /* 響應式設計 */
+    @media (max-width: 1200px) {
+      .main-container {
+        flex-direction: column;
+        height: auto;
+      }
+      .skill-tree-section,
+      .content-section {
+        flex: 1 1 100%;
+        min-height: 50vh;
+      }
+    }
+
+    /* 懸浮視窗遮罩 */
+    .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+    }
+
+    .modal-overlay.active {
+    display: flex;
+    }
+
+    @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+    }
+
+    /* 懸浮視窗內容 */
+    .modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes modalPop {
+    0% {
+        transform: scale(0.5) rotate(-5deg);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+    }
+
+    .modal-icon {
+    font-size: 100px;
+    margin-bottom: 20px;
+    animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    }
+
+    .modal-title {
+    font-size: 36px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-message {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.95);
+    margin-bottom: 30px;
+    line-height: 1.6;
+    }
+
+    .modal-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 煙火特效 */
+    .firework {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    animation: fireworkAnim 1s ease-out forwards;
+    }
+
+    @keyframes fireworkAnim {
+    0% {
+        transform: translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--tx), var(--ty));
+        opacity: 0;
+    }
+    }
+
+    /* 星星飄落特效 */
+    .star {
+    position: absolute;
+    font-size: 20px;
+    animation: starFall 2s ease-in-out infinite;
+    opacity: 0;
+    }
+
+    @keyframes starFall {
+    0% {
+        top: -20px;
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+    }
+
+    /* 失敗懸浮視窗 */
+    .modal-content.fail {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    }
+
+    .modal-content.fail .modal-icon {
+    animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    25% { transform: translateX(-10px) rotate(-5deg); }
+    75% { transform: translateX(10px) rotate(5deg); }
+    }
+
+    /* 雨滴特效 */
+    .raindrop {
+    position: absolute;
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
+    animation: rainFall 1s linear infinite;
+    opacity: 0.7;
+    }
+
+    @keyframes rainFall {
+    0% {
+        top: -20px;
+        opacity: 0.7;
+    }
+    100% {
+        top: 100%;
+        opacity: 0;
+    }
+    }
+
+    /* 碎片特效 */
+    .fragment {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    animation: fragmentFall 2s ease-in forwards;
+    }
+
+    @keyframes fragmentFall {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--fx), var(--fy)) rotate(var(--fr));
+        opacity: 0;
+    }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header - 從 index 複製 -->
+  <header>
+    <nav class="nav-left">
+      <a href="index.html" class="logo-link">
+        <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto; image-rendering:pixelated;" onerror="this.style.display='none'">
+      </a>
+      <button class="nav-btn" onclick="location.href='index.html'">主線任務</button>
+      <button class="nav-btn">支線任務</button>
+      <button class="nav-btn">學習紀錄</button>
+    </nav>
+
+    <div class="nav-right">
+      <button class="auth-btn register-btn">註冊</button>
+      <button class="auth-btn login-btn">登入</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- 左側：技能樹 -->
+    <div class="skill-tree-section">
+      <div class="tree-title">🎮 App Inventor 技能樹</div>
+      
+      <!-- SVG 連接線 -->
+      <svg class="connections-svg" id="connectionsSvg"></svg>
+
+      <div class="skill-tree" id="skillTree">
+        <!-- 第一層（最底層）：基礎介紹 -->
+        <div class="skill-layer">
+          <div class="mainline">
+            <div class="skill-node" data-id="1">
+              <div class="skill-circle available" onclick="openSkill(1)">
+                基礎介紹
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 第二層：介面設計 + 音效設計（支線） -->
+        <div class="skill-layer">
+          <div class="sideline-layer">
+            <div class="side-branches">
+              <div class="skill-node" data-id="3">
+                <div class="skill-circle side locked" onclick="openSkill(3)">
+                  音效設計
+                </div>
+              </div>
+            </div>
+            
+            <div class="mainline">
+              <div class="skill-node" data-id="2">
+                <div class="skill-circle locked" onclick="openSkill(2)">
+                  介面設計
+                </div>
+              </div>
+            </div>
+            
+            <div style="width: 85px;"></div>
+          </div>
+        </div>
+
+        <!-- 第三層：程式邏輯 + 資料儲存（支線） -->
+        <div class="skill-layer">
+          <div class="sideline-layer">
+            <div style="width: 85px;"></div>
+            
+            <div class="mainline">
+              <div class="skill-node" data-id="4">
+                <div class="skill-circle locked" onclick="openSkill(4)">
+                  程式邏輯
+                </div>
+              </div>
+            </div>
+            
+            <div class="side-branches">
+              <div class="skill-node" data-id="5">
+                <div class="skill-circle side locked" onclick="openSkill(5)">
+                  資料儲存
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 第四層：遊戲製作 + 進階音效（支線的支線） -->
+        <div class="skill-layer">
+          <div class="sideline-layer">
+            <div class="side-branches">
+              <div class="skill-node" data-id="8">
+                <div class="skill-circle side locked" onclick="openSkill(8)">
+                  進階音效
+                </div>
+              </div>
+            </div>
+            
+            <div class="mainline">
+              <div class="skill-node" data-id="6">
+                <div class="skill-circle locked" onclick="openSkill(6)">
+                  遊戲製作
+                </div>
+              </div>
+            </div>
+            
+            <div style="width: 85px;"></div>
+          </div>
+        </div>
+
+        <!-- 第五層：專題發表 -->
+        <div class="skill-layer">
+          <div class="mainline">
+            <div class="skill-node" data-id="7">
+              <div class="skill-circle locked" onclick="openSkill(7)">
+                專題發表
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側：內容區域 -->
+    <div class="content-section" id="contentSection">
+      <!-- 初始歡迎訊息 -->
+      <div class="welcome-message" id="welcomeMessage">
+        <div class="welcome-icon">👈</div>
+        <div class="welcome-text">點擊左側技能樹開始學習</div>
+      </div>
+
+      <!-- 影片階段 -->
+      <div id="videoStage" style="display: none;">
+        <div class="content-header">
+          <h2 class="content-title" id="contentTitle">課程名稱</h2>
+          <p class="content-subtitle">觀看教學影片，完成後進行評量</p>
+        </div>
+        <div class="video-container">
+          <div class="video-placeholder">
+            <div style="font-size: 48px; margin-bottom: 15px;">🎬</div>
+            <div>教學影片預留區域</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">影片製作中...</div>
+          </div>
+        </div>
+        <button class="continue-btn" onclick="startQuiz()">開始評量 →</button>
+      </div>
+
+      <!-- 評量階段 -->
+      <div id="quizStage" class="quiz-container">
+        <div class="content-header">
+          <h2 class="content-title">📝 課程評量</h2>
+          <p class="content-subtitle">完成所有題目，達到 100% 正確率即可解鎖下一關</p>
+        </div>
+        <div id="quizContent" style="flex: 1; overflow-y: auto;"></div>
+        <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">提交答案</button>
+        <div id="resultMessage"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 圖例 -->
+  <div class="legend">
+    <div class="legend-title">技能狀態</div>
+    <div class="legend-item">
+      <div class="legend-circle main locked"></div>
+      <span>未解鎖</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle main available"></div>
+      <span>主線可學習</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle side available"></div>
+      <span>支線可學習</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle main completed"></div>
+      <span>主線已完成</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle side completed"></div>
+      <span>支線已完成</span>
+    </div>
+  </div>
+
+  <script>
+    // 技能資料
+    const skills = {
+      1: { 
+        name: '基礎介紹', 
+        type: 'main',
+        videoId:'f2SRmh8cOBU',
+        quiz: [
+          { q: 'App Inventor 是什麼？', options: ['網頁開發工具', '手機應用程式開發平台', '遊戲引擎', '繪圖軟體'], correct: 1 },
+          { q: 'App Inventor 使用什麼方式編程？', options: ['文字程式碼', '拖曳積木', '手繪流程圖', '語音指令'], correct: 1 }
+        ]
+      },
+      2: { 
+        name: '介面設計', 
+        type: 'main',
+        quiz: [
+          { q: '介面設計最重要的原則是？', options: ['美觀', '功能性', '使用者體驗', '以上皆是'], correct: 3 }
+        ]
+      },
+      3: { 
+        name: '音效設計', 
+        type: 'side',
+        quiz: [
+          { q: '好的遊戲音效可以？', options: ['增加遊戲趣味', '提供回饋', '營造氛圍', '以上皆是'], correct: 3 }
+        ]
+      },
+      4: { 
+        name: '程式邏輯', 
+        type: 'main',
+        quiz: [
+          { q: '程式邏輯中最基本的結構是？', options: ['順序結構', '選擇結構', '迴圈結構', '以上皆是'], correct: 3 }
+        ]
+      },
+      5: { 
+        name: '資料儲存', 
+        type: 'side',
+        quiz: [
+          { q: 'App 可以使用什麼方式儲存資料？', options: ['TinyDB', '雲端資料庫', '檔案儲存', '以上皆是'], correct: 3 }
+        ]
+      },
+      6: { 
+        name: '遊戲製作', 
+        type: 'main',
+        quiz: [
+          { q: '製作遊戲需要考慮哪些要素？', options: ['遊戲規則', '計分系統', '難度設計', '以上皆是'], correct: 3 }
+        ]
+      },
+      7: { 
+        name: '專題發表', 
+        type: 'main',
+        quiz: [
+          { q: '發表專題時應該包含？', options: ['作品展示', '設計理念', '技術說明', '以上皆是'], correct: 3 }
+        ]
+      },
+      8: { 
+        name: '進階音效', 
+        type: 'side',
+        quiz: [
+          { q: '進階音效技術包括？', options: ['3D音效', '動態音量', '音效混合', '以上皆是'], correct: 3 }
+        ]
+      }
+    };
+
+    // 連接關係（from -> to）
+    const connections = [
+    // 主線連接（金色）
+    { from: 1, to: 2, type: 'main' },
+    { from: 2, to: 4, type: 'main' },
+    { from: 4, to: 6, type: 'main' },
+    { from: 6, to: 7, type: 'main' },
+    
+    // 支線連接到同層主線（紫色）
+    { from: 2, to: 3, type: 'side' },  // 介面設計 → 音效設計
+    { from: 4, to: 5, type: 'side' },  // 程式邏輯 → 資料儲存
+    { from: 6, to: 8, type: 'side' }   // 遊戲製作 → 進階音效
+    ];
+
+    let currentSkillId = null;
+    let userAnswers = [];
+    let completedSkills = new Set();
+
+    // 繪製連接線
+    function drawConnections() {
+    const svg = document.getElementById('connectionsSvg');
+    svg.innerHTML = '';
+    
+    // 確保 SVG 有正確的尺寸
+    const treeSection = document.querySelector('.skill-tree-section');
+    svg.style.width = treeSection.scrollWidth + 'px';
+    svg.style.height = treeSection.scrollHeight + 'px';
+    
+    connections.forEach(conn => {
+        const fromNode = document.querySelector(`[data-id="${conn.from}"]`);
+        const toNode = document.querySelector(`[data-id="${conn.to}"]`);
+        
+        if (!fromNode || !toNode) {
+        console.log(`找不到節點: from=${conn.from}, to=${conn.to}`);
+        return;
+        }
+        
+        const fromCircle = fromNode.querySelector('.skill-circle');
+        const toCircle = toNode.querySelector('.skill-circle');
+        
+        if (!fromCircle || !toCircle) {
+        console.log(`找不到圓圈: from=${conn.from}, to=${conn.to}`);
+        return;
+        }
+        
+        const fromRect = fromCircle.getBoundingClientRect();
+        const toRect = toCircle.getBoundingClientRect();
+        const containerRect = treeSection.getBoundingClientRect();
+        
+        // 計算相對於 skill-tree-section 的座標
+        const x1 = fromRect.left + fromRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+        const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + treeSection.scrollTop;
+        const x2 = toRect.left + toRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+        const y2 = toRect.top + toRect.height / 2 - containerRect.top + treeSection.scrollTop;
+        
+        console.log(`繪製線條: ${conn.from} → ${conn.to}, (${x1},${y1}) → (${x2},${y2})`);
+        
+        // 添加發光效果
+        const glow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        glow.setAttribute('x1', x1);
+        glow.setAttribute('y1', y1);
+        glow.setAttribute('x2', x2);
+        glow.setAttribute('y2', y2);
+        glow.setAttribute('stroke', conn.type === 'main' ? '#ffd700' : '#a855f7');
+        glow.setAttribute('stroke-width', conn.type === 'main' ? '12' : '8');
+        glow.setAttribute('opacity', '0.2');
+        glow.setAttribute('stroke-linecap', 'round');
+        glow.setAttribute('filter', 'blur(4px)');
+        
+        svg.appendChild(glow);
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        
+        // 主線用金色粗線，支線用紫色細線
+        if (conn.type === 'main') {
+        line.setAttribute('stroke', '#ffd700');
+        line.setAttribute('stroke-width', '6');
+        line.setAttribute('stroke-dasharray', '10,5');
+        } else {
+        line.setAttribute('stroke', '#a855f7');
+        line.setAttribute('stroke-width', '4');
+        line.setAttribute('stroke-dasharray', '8,4');
+        }
+        
+        line.setAttribute('opacity', '0.7');
+        line.setAttribute('stroke-linecap', 'round');
+        
+        svg.appendChild(line);
+    });
+    }
+
+    // 頁面載入後繪製連接線
+    window.addEventListener('load', () => {
+    setTimeout(drawConnections, 200);
+    });
+
+    window.addEventListener('resize', () => {
+    setTimeout(drawConnections, 100);
+    });
+
+    // 頁面載入後繪製連接線
+    window.addEventListener('load', () => {
+      setTimeout(drawConnections, 100);
+    });
+
+    window.addEventListener('resize', drawConnections);
+
+    function openSkill(id) {
+    const node = document.querySelector(`[data-id="${id}"]`);
+    const circle = node.querySelector('.skill-circle');
+    
+    if (circle.classList.contains('locked')) {
+        alert('請先完成前面的課程！');
+        return;
+    }
+    
+    currentSkillId = id;
+    videoWatched = false;  // 重置影片觀看狀態
+    
+    // 隱藏歡迎訊息
+    document.getElementById('welcomeMessage').style.display = 'none';
+    
+    // 顯示影片階段
+    document.getElementById('videoStage').style.display = 'block';
+    document.getElementById('quizStage').classList.remove('active');
+    document.getElementById('quizStage').style.display = 'none';
+    
+    // 設定標題
+    document.getElementById('contentTitle').textContent = skills[id].name;
+    
+    // 載入 YouTube 影片
+    loadYouTubeVideo(id);
+    
+    // 重置結果訊息
+    document.getElementById('resultMessage').innerHTML = '';
+    
+    // 捲動到右側內容區域頂部
+    document.getElementById('contentSection').scrollTop = 0;
+    }
+
+    // 新增：載入 YouTube 影片函數
+    function loadYouTubeVideo(id) {
+    const videoContainer = document.querySelector('.video-container');
+    const skill = skills[id];
+    
+    if (skill.videoId) {
+        // 有 YouTube 影片 ID，顯示嵌入影片
+        videoContainer.innerHTML = `
+        <iframe 
+            id="youtubePlayer"
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/${skill.videoId}?enablejsapi=1&rel=0" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="border-radius: 12px;">
+        </iframe>
+        `;
+        
+        // 5秒後自動標記為已觀看（可調整）
+        setTimeout(() => {
+        videoWatched = true;
+        updateContinueButton();
+        }, 5000);
+    } else {
+        // 沒有影片 ID，顯示預留區域
+        videoContainer.innerHTML = `
+        <div class="video-placeholder">
+            <div style="font-size: 48px; margin-bottom: 15px;">🎬</div>
+            <div>教學影片預留區域</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">影片製作中...</div>
+        </div>
+        `;
+        
+        // 如果沒有影片，直接標記為已觀看
+        videoWatched = true;
+        updateContinueButton();
+    }
+    }
+
+    // 新增：更新繼續按鈕狀態
+    function updateContinueButton() {
+    const continueBtn = document.querySelector('.continue-btn');
+    if (videoWatched) {
+        continueBtn.disabled = false;
+        continueBtn.style.opacity = '1';
+        continueBtn.style.cursor = 'pointer';
+    } else {
+        continueBtn.disabled = true;
+        continueBtn.style.opacity = '0.5';
+        continueBtn.style.cursor = 'not-allowed';
+    }
+    }
+
+    function startQuiz() {
+    if (!videoWatched) {
+        alert('請先觀看完教學影片！');
+        return;
+    }
+
+    // 停止 YouTube 影片
+    stopYouTubeVideo();
+    
+    document.getElementById('videoStage').style.display = 'none';
+    document.getElementById('quizStage').classList.add('active');
+    document.getElementById('quizStage').style.display = 'flex';
+    
+    const quiz = skills[currentSkillId].quiz;
+    let html = '';
+    
+    quiz.forEach((q, index) => {
+        html += `
+        <div class="question">
+            <div class="question-text">${index + 1}. ${q.q}</div>
+            <div class="options">
+            ${q.options.map((opt, i) => `
+                <div class="option" onclick="selectOption(${index}, ${i})">
+                <input type="radio" name="q${index}" value="${i}" id="q${index}_${i}">
+                ${opt}
+                </div>
+            `).join('')}
+            </div>
+        </div>
+        `;
+    });
+    
+    document.getElementById('quizContent').innerHTML = html;
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('resultMessage').innerHTML = '';
+    userAnswers = new Array(quiz.length).fill(null);
+    
+    // 捲動到內容區域頂部
+    document.getElementById('contentSection').scrollTop = 0;
+    }
+
+    // 新增：停止 YouTube 影片函數
+    function stopYouTubeVideo() {
+    const iframe = document.getElementById('youtubePlayer');
+    if (iframe) {
+        // 方法1：移除並重新建立 iframe（最可靠）
+        const videoContainer = document.querySelector('.video-container');
+        videoContainer.innerHTML = `
+        <div class="video-placeholder">
+            <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
+            <div>影片已停止</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">請完成評量</div>
+        </div>
+        `;
+    }
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+    userAnswers[questionIndex] = optionIndex;
+    
+    // 選取對應的 radio button
+    const radioBtn = document.getElementById(`q${questionIndex}_${optionIndex}`);
+    if (radioBtn) {
+        radioBtn.checked = true;
+    }
+    
+    // 更新選項樣式
+    const options = document.querySelectorAll(`.question:nth-child(${questionIndex + 1}) .option`);
+    options.forEach((opt, i) => {
+        if (i === optionIndex) {
+        opt.classList.add('selected');
+        } else {
+        opt.classList.remove('selected');
+        }
+    });
+    }
+
+    function submitQuiz() {
+    const quiz = skills[currentSkillId].quiz;
+    
+    if (userAnswers.includes(null)) {
+        alert('請回答所有題目！');
+        return;
+    }
+
+    let correctCount = 0;
+    quiz.forEach((q, index) => {
+        const options = document.querySelectorAll(`.question:nth-child(${index + 1}) .option`);
+        if (userAnswers[index] === q.correct) {
+        correctCount++;
+        options[userAnswers[index]].classList.add('correct');
+        } else {
+        options[userAnswers[index]].classList.add('wrong');
+        options[q.correct].classList.add('correct');
+        }
+    });
+
+    const percentage = (correctCount / quiz.length) * 100;
+    
+    if (percentage === 100) {
+        // 顯示成功懸浮視窗
+        showSuccessModal();
+    } else {
+        showFailModal(percentage);
+    }
+    
+    document.getElementById('submitBtn').disabled = true;
+    }
+
+    // 顯示成功懸浮視窗
+    function showSuccessModal() {
+    // 創建懸浮視窗
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content">
+        <div class="modal-icon">🎉</div>
+        <div class="modal-title">太棒了！</div>
+        <div class="modal-message">
+            恭喜完成「${skills[currentSkillId].name}」課程！<br>
+            正確率：100%
+        </div>
+        <button class="modal-btn" onclick="closeSuccessModal()">領取獎勵並繼續</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // 添加煙火特效
+    createFireworks(modal);
+    
+    // 添加星星飄落特效
+    createStars(modal);
+    }
+
+    // 創建煙火特效
+    function createFireworks(container) {
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3', '#54a0ff'];
+    
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+        const fireworkContainer = document.createElement('div');
+        fireworkContainer.style.position = 'absolute';
+        fireworkContainer.style.left = Math.random() * 100 + '%';
+        fireworkContainer.style.top = Math.random() * 100 + '%';
+        
+        for (let j = 0; j < 30; j++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            const angle = (Math.PI * 2 * j) / 30;
+            const velocity = 50 + Math.random() * 50;
+            particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+            particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+            
+            fireworkContainer.appendChild(particle);
+        }
+        
+        container.appendChild(fireworkContainer);
+        
+        setTimeout(() => fireworkContainer.remove(), 1000);
+        }, i * 200);
+    }
+    }
+
+    // 創建星星飄落特效
+    function createStars(container) {
+    const stars = ['⭐', '✨', '🌟', '💫'];
+    
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.textContent = stars[Math.floor(Math.random() * stars.length)];
+        star.style.left = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        star.style.animationDuration = (2 + Math.random() * 2) + 's';
+        
+        container.appendChild(star);
+        
+        setTimeout(() => star.remove(), 4000);
+        }, i * 100);
+    }
+    }
+
+    // 關閉成功懸浮視窗
+    function closeSuccessModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+    
+    // 完成技能
+    completeSkill();
+    }
+
+    // 顯示失敗懸浮視窗
+    function showFailModal(percentage) {
+    // 創建懸浮視窗
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay active';
+    modal.innerHTML = `
+        <div class="modal-content fail">
+        <div class="modal-icon">😢</div>
+        <div class="modal-title">再接再厲！</div>
+        <div class="modal-message">
+            「${skills[currentSkillId].name}」課程<br>
+            正確率：${percentage}%<br>
+            需要達到 100% 才能通過喔！
+        </div>
+        <button class="modal-btn" onclick="closeFailModal()">重新挑戰</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // 添加雨滴特效
+    createRaindrops(modal);
+    
+    // 添加碎片特效
+    createFragments(modal);
+    }
+
+    // 創建雨滴特效
+    function createRaindrops(container) {
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+        const raindrop = document.createElement('div');
+        raindrop.className = 'raindrop';
+        raindrop.style.left = Math.random() * 100 + '%';
+        raindrop.style.animationDelay = Math.random() * 1 + 's';
+        raindrop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+        
+        container.appendChild(raindrop);
+        
+        setTimeout(() => raindrop.remove(), 2000);
+        }, i * 50);
+    }
+    }
+
+    // 創建碎片特效
+    function createFragments(container) {
+    const modalContent = container.querySelector('.modal-content');
+    const rect = modalContent.getBoundingClientRect();
+    
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+        const fragment = document.createElement('div');
+        fragment.className = 'fragment';
+        fragment.style.left = '50%';
+        fragment.style.top = '50%';
+        
+        const angle = (Math.PI * 2 * i) / 20;
+        const distance = 100 + Math.random() * 100;
+        fragment.style.setProperty('--fx', Math.cos(angle) * distance + 'px');
+        fragment.style.setProperty('--fy', Math.sin(angle) * distance + 'px');
+        fragment.style.setProperty('--fr', Math.random() * 360 + 'deg');
+        
+        container.appendChild(fragment);
+        
+        setTimeout(() => fragment.remove(), 2000);
+        }, i * 30);
+    }
+    }
+
+    // 關閉失敗懸浮視窗
+    function closeFailModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+    
+    // 重新開始測驗
+    retryQuiz();
+    
+    }
+
+    function retryQuiz() {
+    // 停止影片
+    stopYouTubeVideo();
+    
+    // 重新開啟當前技能
+    const id = currentSkillId;
+    currentSkillId = null;
+    userAnswers = [];
+    videoWatched = false;
+    
+    // 重新顯示影片階段
+    document.getElementById('quizStage').style.display = 'none';
+    document.getElementById('videoStage').style.display = 'block';
+    document.getElementById('resultMessage').innerHTML = '';
+    document.getElementById('contentSection').scrollTop = 0;
+    
+    currentSkillId = id;
+    
+    // 重新載入影片
+    loadYouTubeVideo(id);
+    }
+
+    function completeSkill() {
+      const node = document.querySelector(`[data-id="${currentSkillId}"]`);
+      const circle = node.querySelector('.skill-circle');
+      circle.classList.remove('available');
+      circle.classList.add('completed');
+      completedSkills.add(currentSkillId);
+      
+      // 解鎖下一個技能
+      unlockNextSkills(currentSkillId);
+      
+      // 重新繪製連接線
+      drawConnections();
+      
+      // 返回初始狀態
+      document.getElementById('videoStage').style.display = 'none';
+      document.getElementById('quizStage').style.display = 'none';
+      document.getElementById('welcomeMessage').style.display = 'flex';
+      
+      currentSkillId = null;
+      userAnswers = [];
+    }
+
+    function unlockNextSkills(completedId) {
+    const unlockMap = {
+        1: [2, 3],      // 完成基礎介紹 → 解鎖介面設計和音效設計
+        2: [4],         // 完成介面設計 → 解鎖程式邏輯
+        3: [],          // 音效設計不解鎖其他
+        4: [5, 6],      // 完成程式邏輯 → 解鎖資料儲存和遊戲製作
+        5: [],          // 資料儲存不解鎖其他
+        6: [7, 8],      // 完成遊戲製作 → 解鎖專題發表和進階音效
+        7: [],          // 專題發表（最終）
+        8: []           // 進階音效不解鎖其他
+    };
+    
+    const toUnlock = unlockMap[completedId] || [];
+    toUnlock.forEach(id => {
+        const node = document.querySelector(`[data-id="${id}"]`);
+        if (node) {
+        const circle = node.querySelector('.skill-circle');
+        if (circle && circle.classList.contains('locked')) {
+            // 檢查前置條件
+            if (canUnlock(id)) {
+            circle.classList.remove('locked');
+            circle.classList.add('available');
+            }
+        }
+        }
+    });
+    }
+
+    function canUnlock(skillId) {
+    // 定義每個技能的前置條件（必須完成的技能）
+    const prerequisites = {
+        2: [1],         // 介面設計需要基礎介紹
+        3: [1],         // 音效設計需要基礎介紹
+        4: [2],         // 程式邏輯需要介面設計
+        5: [4],         // 資料儲存需要程式邏輯
+        6: [4],         // 遊戲製作需要程式邏輯
+        7: [6],         // 專題發表需要遊戲製作
+        8: [6]          // 進階音效需要遊戲製作
+    };
+    
+    const required = prerequisites[skillId] || [];
+    return required.every(id => completedSkills.has(id));
+    }
+  </script>
+</body>
+</html>
