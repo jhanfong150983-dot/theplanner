@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.youtube.com/iframe_api"></script>
   <title>THE PLANNER 學習網</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1059,6 +1060,13 @@
 
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAf9WAg_Mn9k6_hFdj3eLhPzcyYnZReM7Je2sEQznq2lDnKHZQsy2xyPKGK8bhNqBL/exec';
 
+    // YouTube 播放器相關
+    let youtubePlayer = null;
+    let videoStartTime = null;
+    let totalWatchTime = 0;
+    let lastUpdateTime = null;
+    let videoSkipped = false;
+
     // 從 URL 取得專案 ID
     const urlParams = new URLSearchParams(window.location.search);
     const projectId = urlParams.get('project') || 'appinventor';
@@ -1327,26 +1335,33 @@ function drawConnections() {
     function loadYouTubeVideo(id) {
       const videoContainer = document.querySelector('.video-container');
       const skill = skills[id];
+
+      // 重置狀態
+      totalWatchTime = 0;
+      videoSkipped = false;
+      videoWatched = false;
+      lastUpdateTime = null;
       
       if (skill.videoId) {
-        videoContainer.innerHTML = `
-          <iframe 
-            id="youtubePlayer"
-            width="100%" 
-            height="100%" 
-            src="https://www.youtube.com/embed/${skill.videoId}?enablejsapi=1&rel=0" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen
-            style="border-radius: 12px;">
-          </iframe>
-        `;
-        
-        setTimeout(() => {
-          videoWatched = true;
-          updateContinueButton();
-        }, 5000);
-      } else {
+        videoContainer.innerHTML = `<div id="youtubePlayer"></div>`;
+      
+      // 初始化 YouTube 播放器
+        youtubePlayer = new YT.Player('youtubePlayer', {
+        width: '100%',
+        height: '100%',
+        videoId: skill.videoId,
+        playerVars: {
+          'autoplay': 0,
+          'rel': 0,
+          'modestbranding': 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+        } else {
+        // 沒有影片，直接允許繼續
         videoContainer.innerHTML = `
           <div class="video-placeholder">
             <div style="font-size: 48px; margin-bottom: 15px;">🎬</div>
@@ -1354,7 +1369,6 @@ function drawConnections() {
             <div style="font-size: 14px; color: #999; margin-top: 10px;">影片製作中...</div>
           </div>
         `;
-        
         videoWatched = true;
         updateContinueButton();
       }
@@ -1380,6 +1394,76 @@ function drawConnections() {
       }
     }
 
+    // YouTube 播放器就緒
+    function onPlayerReady(event) {
+      console.log('✅ YouTube 播放器已就緒');
+      videoStartTime = new Date();
+    }
+
+    // YouTube 播放狀態變化
+    function onPlayerStateChange(event) {
+      const state = event.data;
+      const now = new Date();
+      
+      if (state === YT.PlayerState.PLAYING) {
+        // 開始播放
+        console.log('▶️ 影片開始播放');
+        lastUpdateTime = now;
+        
+      } else if (state === YT.PlayerState.PAUSED || state === YT.PlayerState.ENDED) {
+        // 暫停或結束
+        if (lastUpdateTime) {
+          const watchedSeconds = Math.floor((now - lastUpdateTime) / 1000);
+          totalWatchTime += watchedSeconds;
+          console.log(`⏸️ 累計觀看時間: ${totalWatchTime}秒`);
+          lastUpdateTime = null;
+        }
+        
+        // 影片結束
+        if (state === YT.PlayerState.ENDED) {
+          console.log('✅ 影片播放完畢');
+          videoWatched = true;
+          updateContinueButton();
+        }
+      } else if (state === YT.PlayerState.CUED) {
+        // 影片已載入，允許跳過
+        console.log('ℹ️ 影片已載入，可以跳過');
+        setTimeout(() => {
+          videoWatched = true;
+          videoSkipped = true;
+          updateContinueButton();
+        }, 3000); // 3秒後允許跳過
+      }
+    }
+
+    // 取得真實觀看時間（秒）
+    function getRealWatchTime() {
+      let time = totalWatchTime;
+      
+      // 如果正在播放，加上當前這段時間
+      if (lastUpdateTime) {
+        const now = new Date();
+        time += Math.floor((now - lastUpdateTime) / 1000);
+      }
+      
+      return time;
+    }
+
+    // 取得觀看完成率
+    function getWatchCompletionRate() {
+      if (!youtubePlayer || !youtubePlayer.getDuration) {
+        return videoSkipped ? 0 : 100;
+      }
+      
+      const duration = youtubePlayer.getDuration();
+      if (duration === 0) return 100;
+      
+      const watchTime = getRealWatchTime();
+      const rate = Math.min(Math.round((watchTime / duration) * 100), 100);
+      
+      return rate;
+    }
+
     function updateContinueButton() {
       const continueBtn = document.querySelector('.continue-btn');
       if (videoWatched) {
@@ -1396,14 +1480,14 @@ function drawConnections() {
     // 開始測驗
     function startQuiz() {
       quizStartTime = new Date();
-      
-      if (!videoWatched) {
-        alert('請先觀看完教學影片！');
-        return;
-      }
 
       // 🔥 修正：記錄影片觀看（對應資料庫欄位）
       if (currentUser && window.skillStartTime) {
+        const realWatchTime = getRealWatchTime();
+        const completionRate = getWatchCompletionRate();
+
+        console.log(`📊 影片統計：觀看時間 ${realWatchTime}秒，完成率 ${completionRate}%`);
+
         makeRequest({
           action: 'saveVideoWatch',
           userId: currentUser.userId,
@@ -1453,17 +1537,29 @@ function drawConnections() {
     }
 
     function stopYouTubeVideo() {
-      const iframe = document.getElementById('youtubePlayer');
-      if (iframe) {
-        const videoContainer = document.querySelector('.video-container');
-        videoContainer.innerHTML = `
-          <div class="video-placeholder">
-            <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
-            <div>影片已停止</div>
-            <div style="font-size: 14px; color: #999; margin-top: 10px;">請完成評量</div>
-          </div>
-        `;
+      // 記錄最後的觀看時間
+      if (lastUpdateTime) {
+        const now = new Date();
+        const watchedSeconds = Math.floor((now - lastUpdateTime) / 1000);
+        totalWatchTime += watchedSeconds;
+        lastUpdateTime = null;
       }
+      
+      // 停止播放器
+      if (youtubePlayer && youtubePlayer.pauseVideo) {
+        youtubePlayer.pauseVideo();
+      }
+      
+      const videoContainer = document.querySelector('.video-container');
+      videoContainer.innerHTML = `
+        <div class="video-placeholder">
+          <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
+          <div>影片已停止</div>
+          <div style="font-size: 14px; color: #999; margin-top: 10px;">
+            觀看時間: ${Math.floor(totalWatchTime / 60)}分${totalWatchTime % 60}秒
+          </div>
+        </div>
+      `;
     }
 
     function selectOption(questionIndex, optionIndex) {
