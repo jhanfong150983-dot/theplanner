@@ -1054,11 +1054,17 @@
   </div>
 
   <script>
+    function formatTimeHHMMSS(seconds) {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const s = seconds % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
     // ============================================
     // 🔥 主要修正：API 和資料結構對應
     // ============================================
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAf9WAg_Mn9k6_hFdj3eLhPzcyYnZReM7Je2sEQznq2lDnKHZQsy2xyPKGK8bhNqBL/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwnRpfvGNOUB4wa97XXEGGStxm0IhpUxc2wgMEFW14inxyMUevB5wOmNr_7W03-nxYp/exec';
 
     // YouTube 播放器相關
     let youtubePlayer = null;
@@ -1384,7 +1390,8 @@ function drawConnections() {
           skillType: skills[id].type,
           learningDate: new Date().toLocaleDateString('zh-TW'),
           learningTimeSlot: getCurrentTimeSlot(),
-          learningMinutes: 0,
+          learningSeconds: 0,
+          learningTime: '00:00:00',
           status: 'started'
         }).then(() => {
           console.log('✅ 已記錄開始學習');
@@ -1556,7 +1563,7 @@ function drawConnections() {
           <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
           <div>影片已停止</div>
           <div style="font-size: 14px; color: #999; margin-top: 10px;">
-            觀看時間: ${Math.floor(totalWatchTime / 60)}分${totalWatchTime % 60}秒
+            觀看時間: ${formatTimeHHMMSS(totalWatchTime)}
           </div>
         </div>
       `;
@@ -1661,7 +1668,8 @@ function drawConnections() {
       
       if (currentUser && window.skillStartTime) {
         const completeTime = new Date();
-        const learningMinutes = Math.floor((completeTime - window.skillStartTime) / 60000);
+        const learningSeconds = Math.floor((completeTime - window.skillStartTime) / 1000);
+        const learningTime = formatTimeHHMMSS(learningSeconds); 
 
         // 🔥 修正：使用 updateSkillProgress 更新技能進度表
         makeRequest({
@@ -1689,7 +1697,8 @@ function drawConnections() {
           skillType: skills[currentSkillId].type,
           learningDate: new Date().toLocaleDateString('zh-TW'),
           learningTimeSlot: getCurrentTimeSlot(),
-          learningMinutes: learningMinutes,
+          learningSeconds: learningSeconds,
+          learningTime: learningTime,
           status: 'completed',
           completeTime: completeTime.toLocaleDateString('zh-TW')
         }).then(() => {
@@ -1702,8 +1711,9 @@ function drawConnections() {
         makeRequest({
           action: 'saveDailyLearning',
           userId: currentUser.userId,
-          dailyMinutes: learningMinutes,
-          streakDays: 1 // 需要計算連續天數
+          dailySeconds: learningSeconds,
+          dailyTime: learningTime,
+          streakDays: 1
         }).then(() => {
           console.log('✅ 已記錄每日學習');
         }).catch(err => {
