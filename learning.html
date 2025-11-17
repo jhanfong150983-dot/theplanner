@@ -1064,7 +1064,7 @@
     // 🔥 主要修正：API 和資料結構對應
     // ============================================
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzwAMgbd3v5bLAvlVsjUDeD9YIbMmbTK7lW8Ccx3B4_KV13grydFlp-T34Lfxp_853Y/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby292a8Rs_CUyxqoWlcE_-Slfg4Sn0LqjMhirb02voYO037wBvZI4KzN8lAJp6LlTdP/exec';
 
     // YouTube 播放器相關
     let youtubePlayer = null;
@@ -1255,43 +1255,52 @@ function drawConnections() {
     });
 
     async function loadUserProgress() {
-  if (!currentUser || !currentUser.userId) {
-    console.log('⚠️ 未登入，跳過載入進度');
-    return;
-  }
-  
-  try {
-    console.log('📌 載入使用者進度:', currentUser.userId);
+    if (!currentUser || !currentUser.userId) {
+      console.log('⚠️ 未登入，跳過載入進度');
+      return;
+    }
     
-    const response = await makeRequest({
-      action: 'getUserProgress',
-      userId: currentUser.userId,
-      courseId: projectId
-    });
-    
-    if (response.success && response.data && response.data.length > 0) {
-      // 標記已完成的技能
-      response.data.forEach(progress => {
-        const skillId = progress.skillId.toString();
-        if (progress.status === '已完成' || progress.progressPercentage >= 100) {
-          completedSkills.add(skillId);
-          
-          const node = document.querySelector(`[data-id="${skillId}"]`);
-          if (node) {
-            const circle = node.querySelector('.skill-circle');
+    try {
+      console.log('📌 載入使用者進度:', currentUser.userId);
+      
+      const response = await makeRequest({
+        action: 'getUserProgress',
+        userId: currentUser.userId,
+        courseId: projectId
+      });
+
+      console.log('📥 進度回應:', response);
+      
+      if (response.success && response.data) {
+      const completedSkillIds = response.data.completedSkills || [];
+      
+      console.log('✅ 已完成的技能ID:', completedSkillIds);
+      
+      // 🔥 標記已完成的技能
+      completedSkillIds.forEach(skillId => {
+        completedSkills.add(skillId.toString()); // 轉為字串
+        
+        const node = document.querySelector(`[data-id="${skillId}"]`);
+        if (node) {
+          const circle = node.querySelector('.skill-circle');
+          if (circle) {
             circle.classList.remove('locked', 'available');
             circle.classList.add('completed');
+            console.log(`  ✓ 標記技能 ${skillId} 為已完成`);
           }
+        } else {
+          console.warn(`  ⚠️ 找不到技能節點: ${skillId}`);
         }
       });
       
-      // 解鎖下一個技能
-      completedSkills.forEach(skillId => {
-        unlockNextSkills(skillId);
+      // 🔥 解鎖下一個技能
+      completedSkillIds.forEach(skillId => {
+        unlockNextSkills(skillId.toString());
       });
       
       console.log('✅ 使用者進度載入完成');
       console.log('   已完成技能:', Array.from(completedSkills));
+      
     } else {
       console.log('ℹ️ 該使用者尚無學習進度，將從頭開始');
     }
@@ -1299,43 +1308,43 @@ function drawConnections() {
     console.error('❌ 載入使用者進度失敗:', err);
     console.log('ℹ️ 忽略錯誤，繼續載入課程');
   }
-}
+  }
 
-    // 🔥 修正：getCurrentTimeSlot 函數
-    function getCurrentTimeSlot() {
-      const hour = new Date().getHours();
-      if (hour >= 8 && hour < 12) return '08:00-12:00';
-      if (hour >= 12 && hour < 18) return '12:00-18:00';
-      if (hour >= 18 && hour < 24) return '18:00-24:00';
-      return '00:00-08:00';
-    }
-
-    // 開啟技能
-    function openSkill(id) {
-      const node = document.querySelector(`[data-id="${id}"]`);
-      const circle = node.querySelector('.skill-circle');
-      
-      if (circle.classList.contains('locked')) {
-        alert('請先完成前面的課程！');
-        return;
+      // 🔥 修正：getCurrentTimeSlot 函數
+      function getCurrentTimeSlot() {
+        const hour = new Date().getHours();
+        if (hour >= 8 && hour < 12) return '08:00-12:00';
+        if (hour >= 12 && hour < 18) return '12:00-18:00';
+        if (hour >= 18 && hour < 24) return '18:00-24:00';
+        return '00:00-08:00';
       }
-      
-      currentSkillId = id;
-      videoWatched = false;
-      window.skillStartTime = new Date();
-      currentAttempts = 1;
-      
-      document.getElementById('welcomeMessage').style.display = 'none';
-      document.getElementById('videoStage').style.display = 'block';
-      document.getElementById('quizStage').classList.remove('active');
-      document.getElementById('quizStage').style.display = 'none';
-      document.getElementById('contentTitle').textContent = skills[id].name;
-      
-      loadYouTubeVideo(id);
-      
-      document.getElementById('resultMessage').innerHTML = '';
-      document.getElementById('contentSection').scrollTop = 0;
-    }
+
+      // 開啟技能
+      function openSkill(id) {
+        const node = document.querySelector(`[data-id="${id}"]`);
+        const circle = node.querySelector('.skill-circle');
+        
+        if (circle.classList.contains('locked')) {
+          alert('請先完成前面的課程！');
+          return;
+        }
+        
+        currentSkillId = id;
+        videoWatched = false;
+        window.skillStartTime = new Date();
+        currentAttempts = 1;
+        
+        document.getElementById('welcomeMessage').style.display = 'none';
+        document.getElementById('videoStage').style.display = 'block';
+        document.getElementById('quizStage').classList.remove('active');
+        document.getElementById('quizStage').style.display = 'none';
+        document.getElementById('contentTitle').textContent = skills[id].name;
+        
+        loadYouTubeVideo(id);
+        
+        document.getElementById('resultMessage').innerHTML = '';
+        document.getElementById('contentSection').scrollTop = 0;
+      }
 
     // 載入 YouTube 影片
     function loadYouTubeVideo(id) {
@@ -1665,6 +1674,7 @@ function drawConnections() {
       circle.classList.remove('available');
       circle.classList.add('completed');
       completedSkills.add(currentSkillId);
+      completedSkills.add(currentSkillId.toString());
       
       if (currentUser && window.skillStartTime) {
         const completeTime = new Date();
@@ -1721,7 +1731,7 @@ function drawConnections() {
         });
       }
       
-      unlockNextSkills(currentSkillId);
+      unlockNextSkills(currentSkillId.toString());
       drawConnections();
       
       document.getElementById('videoStage').style.display = 'none';
@@ -1733,7 +1743,12 @@ function drawConnections() {
     }
 
     function unlockNextSkills(completedId) {
-      const toUnlock = unlockMap[completedId] || [];
+      // 🔥 確保 completedId 是數字
+      const completedIdNum = parseInt(completedId);
+      const toUnlock = unlockMap[completedIdNum] || [];
+      
+      console.log(`🔓 嘗試解鎖技能 ${completedIdNum} 的下一關:`, toUnlock);
+      
       toUnlock.forEach(id => {
         const node = document.querySelector(`[data-id="${id}"]`);
         if (node) {
@@ -1742,6 +1757,9 @@ function drawConnections() {
             if (canUnlock(id)) {
               circle.classList.remove('locked');
               circle.classList.add('available');
+              console.log(`  ✓ 解鎖技能 ${id}`);
+            } else {
+              console.log(`  ⚠️ 技能 ${id} 還有未完成的前置技能`);
             }
           }
         }
@@ -1749,8 +1767,21 @@ function drawConnections() {
     }
 
     function canUnlock(skillId) {
-      const required = prerequisites[skillId] || [];
-      return required.every(id => completedSkills.has(id));
+      const skillIdNum = parseInt(skillId);
+      const required = prerequisites[skillIdNum] || [];
+      
+      if (required.length === 0) {
+        return true; // 沒有前置條件
+      }
+      
+      // 檢查所有前置技能是否都已完成
+      const allCompleted = required.every(id => 
+        completedSkills.has(id.toString())
+      );
+      
+      console.log(`  檢查技能 ${skillIdNum} 前置條件:`, required, '已完成:', allCompleted);
+      
+      return allCompleted;
     }
 
     // 🔥 動態生成技能樹 HTML
