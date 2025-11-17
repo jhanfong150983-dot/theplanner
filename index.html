@@ -361,43 +361,50 @@
           action: 'getUserStats',
           userId: currentUser.userId
         });
+
+        console.log('📥 完整回應:', response);
         
-        if (response.success) {
-          console.log('✅ 統計資料:', response.data);
-          
-          // 更新使用者資料
-          currentUser.completedCourses = response.data.completedCourses || 0;
-          currentUser.totalHours = response.data.totalHours || 0;
-          
-          // 儲存回 localStorage
-          localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          
-          // 更新 UI 顯示
-          const statsText = document.getElementById('statsText');
-          if (statsText) {
-            statsText.innerHTML = `完成 ${currentUser.completedCourses} 課程 | ${currentUser.totalHours}h`;
-          }
-          
-          // 移除載入中提示
-          const loadingStats = document.getElementById('loadingStats');
-          if (loadingStats) {
-            loadingStats.remove();
-          }
-          
-        } else {
-          console.error('❌ 讀取統計失敗:', response.error);
+        if (response && response.success && response.data) {
+        console.log('✅ 統計資料:', response.data);
+        
+        // 更新使用者資料
+        currentUser.completedCourses = response.data.completedCourses || 0;
+        currentUser.totalHours = response.data.totalHours || 0;
+        currentUser.totalSeconds = response.data.totalSeconds || 0;
+        currentUser.totalTime = response.data.totalTime || '00:00:00';
+        
+        // 儲存回 localStorage
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        // 更新 UI 顯示（改為顯示格式化時間）
+        const statsText = document.getElementById('statsText');
+        if (statsText) {
+            statsText.innerHTML = `完成 ${currentUser.completedCourses} 課程 | ${currentUser.totalTime}`;
         }
-        
-      } catch (error) {
-        console.error('❌ 讀取統計失敗:', error);
         
         // 移除載入中提示
         const loadingStats = document.getElementById('loadingStats');
         if (loadingStats) {
-          loadingStats.textContent = '(離線資料)';
+            loadingStats.remove();
+        }
+        
+        } else {
+        console.error('❌ API 回應格式錯誤:', response);
+        throw new Error('回應格式不正確');
+        }
+        
+    } catch (error) {
+        console.error('❌ 讀取統計失敗:', error);
+        
+        // 移除載入中提示，顯示錯誤
+        const loadingStats = document.getElementById('loadingStats');
+        if (loadingStats) {
+        loadingStats.textContent = '(無法載入)';
+        loadingStats.style.color = '#ffcccc';
         }
       }
     }
+     
     
     // ============================================
     // 📌 4. JSONP 請求函數
