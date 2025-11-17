@@ -1129,71 +1129,163 @@
     let quizStartTime = null;
 
     // 繪製連接線
-    function drawConnections() {
-      const svg = document.getElementById('connectionsSvg');
-      svg.innerHTML = '';
+    // 繪製連接線
+function drawConnections() {
+  const svg = document.getElementById('connectionsSvg');
+  svg.innerHTML = '';
+  
+  const treeSection = document.querySelector('.skill-tree-section');
+  svg.style.width = treeSection.scrollWidth + 'px';
+  svg.style.height = treeSection.scrollHeight + 'px';
+  
+  // 🔥 重新計算連接線邏輯
+  const drawnConnections = [];
+  
+  // 1. 主線垂直連接（連接相鄰層級的主線技能）
+  Object.values(skills).forEach(skill => {
+    if (skill.type === 'main' && skill.position === 'center') {
+      const nextLayerSkill = Object.values(skills).find(s => 
+        s.type === 'main' && 
+        s.position === 'center' && 
+        s.layer === skill.layer + 1
+      );
       
-      const treeSection = document.querySelector('.skill-tree-section');
-      svg.style.width = treeSection.scrollWidth + 'px';
-      svg.style.height = treeSection.scrollHeight + 'px';
-      
-      connections.forEach(conn => {
-        const fromNode = document.querySelector(`[data-id="${conn.from}"]`);
-        const toNode = document.querySelector(`[data-id="${conn.to}"]`);
-        
-        if (!fromNode || !toNode) return;
-        
-        const fromCircle = fromNode.querySelector('.skill-circle');
-        const toCircle = toNode.querySelector('.skill-circle');
-        
-        if (!fromCircle || !toCircle) return;
-        
-        const fromRect = fromCircle.getBoundingClientRect();
-        const toRect = toCircle.getBoundingClientRect();
-        const containerRect = treeSection.getBoundingClientRect();
-        
-        const x1 = fromRect.left + fromRect.width / 2 - containerRect.left + treeSection.scrollLeft;
-        const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + treeSection.scrollTop;
-        const x2 = toRect.left + toRect.width / 2 - containerRect.left + treeSection.scrollLeft;
-        const y2 = toRect.top + toRect.height / 2 - containerRect.top + treeSection.scrollTop;
-        
-        const glow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        glow.setAttribute('x1', x1);
-        glow.setAttribute('y1', y1);
-        glow.setAttribute('x2', x2);
-        glow.setAttribute('y2', y2);
-        glow.setAttribute('stroke', conn.type === 'main' ? '#ffd700' : '#a855f7');
-        glow.setAttribute('stroke-width', conn.type === 'main' ? '12' : '8');
-        glow.setAttribute('opacity', '0.2');
-        glow.setAttribute('stroke-linecap', 'round');
-        glow.setAttribute('filter', 'blur(4px)');
-        svg.appendChild(glow);
-        
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-        
-        if (conn.type === 'main') {
-          line.setAttribute('stroke', '#ffd700');
-          line.setAttribute('stroke-width', '6');
-          line.setAttribute('stroke-dasharray', '10,5');
-        } else {
-          line.setAttribute('stroke', '#a855f7');
-          line.setAttribute('stroke-width', '4');
-          line.setAttribute('stroke-dasharray', '8,4');
-        }
-        
-        line.setAttribute('opacity', '0.7');
-        line.setAttribute('stroke-linecap', 'round');
-        svg.appendChild(line);
-      });
+      if (nextLayerSkill) {
+        drawnConnections.push({
+          from: skill.id,
+          to: nextLayerSkill.id,
+          type: 'main'
+        });
+      }
     }
+  });
+  
+  // 2. 支線水平連接（連接到同一層級的主線）
+  Object.values(skills).forEach(skill => {
+    if (skill.type === 'side') {
+      const sameLayerMainSkill = Object.values(skills).find(s => 
+        s.type === 'main' && 
+        s.position === 'center' && 
+        s.layer === skill.layer
+      );
+      
+      if (sameLayerMainSkill) {
+        drawnConnections.push({
+          from: skill.id,
+          to: sameLayerMainSkill.id,
+          type: 'side'
+        });
+      }
+    }
+  });
+  
+  // 繪製所有連接線
+    drawnConnections.forEach(conn => {
+      const fromNode = document.querySelector(`[data-id="${conn.from}"]`);
+      const toNode = document.querySelector(`[data-id="${conn.to}"]`);
+      
+      if (!fromNode || !toNode) return;
+      
+      const fromCircle = fromNode.querySelector('.skill-circle');
+      const toCircle = toNode.querySelector('.skill-circle');
+      
+      if (!fromCircle || !toCircle) return;
+      
+      const fromRect = fromCircle.getBoundingClientRect();
+      const toRect = toCircle.getBoundingClientRect();
+      const containerRect = treeSection.getBoundingClientRect();
+      
+      const x1 = fromRect.left + fromRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+      const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + treeSection.scrollTop;
+      const x2 = toRect.left + toRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+      const y2 = toRect.top + toRect.height / 2 - containerRect.top + treeSection.scrollTop;
+      
+      // 光暈效果
+      const glow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      glow.setAttribute('x1', x1);
+      glow.setAttribute('y1', y1);
+      glow.setAttribute('x2', x2);
+      glow.setAttribute('y2', y2);
+      glow.setAttribute('stroke', conn.type === 'main' ? '#ffd700' : '#a855f7');
+      glow.setAttribute('stroke-width', conn.type === 'main' ? '12' : '8');
+      glow.setAttribute('opacity', '0.2');
+      glow.setAttribute('stroke-linecap', 'round');
+      glow.setAttribute('filter', 'blur(4px)');
+      svg.appendChild(glow);
+      
+      // 實際連接線
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      
+      if (conn.type === 'main') {
+        line.setAttribute('stroke', '#ffd700');
+        line.setAttribute('stroke-width', '6');
+        line.setAttribute('stroke-dasharray', '10,5');
+      } else {
+        line.setAttribute('stroke', '#a855f7');
+        line.setAttribute('stroke-width', '4');
+        line.setAttribute('stroke-dasharray', '8,4');
+      }
+      
+      line.setAttribute('opacity', '0.7');
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
+    });
+  }
 
     window.addEventListener('resize', () => {
       setTimeout(drawConnections, 100);
     });
+
+    async function loadUserProgress() {
+  if (!currentUser || !currentUser.userId) {
+    console.log('⚠️ 未登入，跳過載入進度');
+    return;
+  }
+  
+  try {
+    console.log('📌 載入使用者進度:', currentUser.userId);
+    
+    const response = await makeRequest({
+      action: 'getUserProgress',
+      userId: currentUser.userId,
+      courseId: projectId
+    });
+    
+    if (response.success && response.data && response.data.length > 0) {
+      // 標記已完成的技能
+      response.data.forEach(progress => {
+        const skillId = progress.skillId.toString();
+        if (progress.status === '已完成' || progress.progressPercentage >= 100) {
+          completedSkills.add(skillId);
+          
+          const node = document.querySelector(`[data-id="${skillId}"]`);
+          if (node) {
+            const circle = node.querySelector('.skill-circle');
+            circle.classList.remove('locked', 'available');
+            circle.classList.add('completed');
+          }
+        }
+      });
+      
+      // 解鎖下一個技能
+      completedSkills.forEach(skillId => {
+        unlockNextSkills(skillId);
+      });
+      
+      console.log('✅ 使用者進度載入完成');
+      console.log('   已完成技能:', Array.from(completedSkills));
+    } else {
+      console.log('ℹ️ 該使用者尚無學習進度，將從頭開始');
+    }
+  } catch (err) {
+    console.error('❌ 載入使用者進度失敗:', err);
+    console.log('ℹ️ 忽略錯誤，繼續載入課程');
+  }
+}
 
     // 🔥 修正：getCurrentTimeSlot 函數
     function getCurrentTimeSlot() {
