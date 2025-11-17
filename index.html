@@ -63,18 +63,6 @@
       font-weight: 600;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .register-btn {
-      background: transparent;
-      color: white;
-      border: 2px solid rgba(255, 255, 255, 0.8);
-    }
-    .register-btn:hover {
-      background: white;
-      color: #4a6cf7;
-      border-color: white;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
     .login-btn {
       background: white;
       color: #4a6cf7;
@@ -88,47 +76,7 @@
       transform: translateY(0);
     }
 
-    /* 文宣 Banner */
-    .banner {
-      width: 100%; height: 220px; background: url('https://placehold.co/1200x300?text=PBL+Learning+Platform') center/cover;
-      display: flex; justify-content: center; align-items: center; color: white;
-      font-size: 26px; font-weight: bold;
-    }
-
-    .container { max-width: 1100px; margin: 20px auto; padding: 10px; }
-
-    /* 專題區標題 */
-    .section-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; }
-
-    /* 卡片群組 */
-    .card-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
-    }
-
-    /* 單一卡片 */
-    .project-card {
-      background: white; border-radius: 12px; overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    }
-    .project-cover {
-      width: 100%; height: 150px;
-      background-size: cover; background-position: center;
-    }
-    .project-content { padding: 15px; }
-    .project-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
-    .project-desc { color: #555; font-size: 14px; margin-bottom: 10px; }
-    .project-btn {
-      background: #4a6cf7; border: none; color: white;
-      padding: 8px 12px; border-radius: 6px; cursor: pointer;
-    }
-
-    /* 頁尾 */
-    footer {
-      margin-top: 40px; padding: 20px; background: #e9ebf1; text-align: center;
-      color: #555; font-size: 14px;
-    }
-
-    /* Banner 覆寫 / 模組化 */
+    /* Banner */
     .mission-banner {
         width: 100%;
         min-height: 320px;
@@ -150,20 +98,11 @@
         align-items: center;
     }
 
-    /* 左側：任務卡群 */
     .mission-cards {
         display: flex;
         flex-direction: column;
         gap: 12px;
         flex: 1 1 60%;
-    }
-    .mission-title {
-        font-size: 20px;
-        letter-spacing: 1px;
-        color: #ffdd55;
-        margin-bottom: 6px;
-        font-weight: 700;
-        text-shadow: 0 1px 0 rgba(0,0,0,0.4);
     }
     .slogan {
         font-size: 28px;
@@ -198,7 +137,6 @@
         font-weight: 1000;
         font-size: 30px;
         color: #2b0800;
-        image-rendering: pixelated;
     }
     .card .meta {
         font-size: 13px; color: #fff;
@@ -206,7 +144,6 @@
     .card .meta .label { font-weight:700; display:block; }
     .card .meta .sub { font-size:15px; color: #ffd; opacity:0.9; }
 
-    /* 右側：吉祥物 */
     .mascot-wrap {
         flex: 0 0 220px;
         display: flex;
@@ -217,8 +154,6 @@
     .mascot {
         width: 180px;
         height: auto;
-        image-rendering: pixelated;
-        transform-origin: center;
         filter: drop-shadow(0 10px 18px rgba(0,0,0,0.45));
         animation: float 3.6s ease-in-out infinite;
     }
@@ -228,87 +163,104 @@
         100% { transform: translateY(0); }
     }
 
-    /* 補充小徽章 (XP / Badge) */
-    .badge {
-        position: absolute;
-        left: 10%;
-        top: 24%;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: #fff;
-        padding: 8px 10px;
-        border-radius: 10px;
-        font-weight:700;
-        display:flex; gap:8px; align-items:center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-    }
-    .badge .dot { width:18px; height:18px; background:#ffd37a; border-radius:4px; display:inline-block; image-rendering: pixelated; }
+    .container { max-width: 1100px; margin: 20px auto; padding: 10px; }
+    .section-title { font-size: 24px; font-weight: bold; margin-bottom: 12px; }
 
-    /* RWD */
+    .card-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;
+    }
+
+    .project-card {
+      background: white; border-radius: 12px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: transform 0.3s;
+    }
+    .project-card:hover {
+      transform: translateY(-5px);
+    }
+    .project-cover {
+      width: 100%; height: 150px;
+      background-size: cover; background-position: center;
+    }
+    .project-content { padding: 15px; }
+    .project-title { font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+    .project-desc { color: #555; font-size: 14px; margin-bottom: 10px; }
+    .project-btn {
+      background: #4a6cf7; border: none; color: white;
+      padding: 8px 12px; border-radius: 6px; cursor: pointer;
+      transition: all 0.3s;
+    }
+    .project-btn:hover {
+      background: #3b5ad6;
+    }
+
+    footer {
+      margin-top: 40px; padding: 20px; background: #e9ebf1; text-align: center;
+      color: #555; font-size: 14px;
+    }
+
+    /* 載入中提示 */
+    .loading-stats {
+      font-size: 11px;
+      opacity: 0.7;
+      font-style: italic;
+    }
+
     @media (max-width: 880px) {
         .mission-inner { padding: 18px; gap: 12px; }
         .mission-cards { flex: 1 1 100%; }
-        .mascot-wrap { display: none; } /* 手機先隱藏吉祥物，以免擋字 */
+        .mascot-wrap { display: none; }
         .slogan { font-size: 20px; }
         .card { width: calc(50% - 8px); }
     }
     @media (max-width: 420px) {
         .card { width: 100%; }
     }
-
   </style>
 </head>
 <body>
   <header>
-    <!-- 左側:功能按鈕 -->
     <nav class="nav-left">
-        <!-- Logo -->
         <a href="#" class="logo-link">
-        <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto; image-rendering:pixelated;">
+        <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto;" onerror="this.style.display='none'">
         </a>
         <button class="nav-btn">主線任務</button>
         <button class="nav-btn">支線任務</button>
-        <button class="nav-btn">學習紀錄</button>
+        <button class="nav-btn" onclick="goToDashboard()">學習分析</button>
     </nav>
 
-    <!-- 右側：登入 -->
-    <div class="nav-right">
+    <div class="nav-right" id="navRight">
         <button class="auth-btn login-btn" onclick="window.location.href='login.html'">登入</button>
     </div>
   </header>
 
-
-  <!-- 文宣 Banner -->
-  <div class="mission-banner" role="banner" aria-label="展開你的學習冒險 Banner">
-  <div class="mission-inner">
-    <div class="mission-cards" aria-hidden="false">
-      <div class="slogan">展開你的學習冒險</div>
-      <div class="mission-row">
+  <div class="mission-banner">
+    <div class="mission-inner">
+      <div class="mission-cards">
+        <div class="slogan">展開你的學習冒險</div>
         <div class="mission-row">
-        <div class="card">
-            <div class="icon">📚</div>
-            <div class="meta"><span class="label">課程探索</span><span class="sub">各式各樣的主題</span></div>
-        </div>
-        <div class="card">
-            <div class="icon">🕹️</div>
-            <div class="meta"><span class="label">技能學習</span><span class="sub">隨時挑戰新技能</span></div>
-        </div>
-        <div class="card">
-            <div class="icon">🏆</div>
-            <div class="meta"><span class="label">成就系統</span><span class="sub">看見學習的足跡</span></div>
-        </div>
+          <div class="card">
+              <div class="icon">📚</div>
+              <div class="meta"><span class="label">課程探索</span><span class="sub">各式各樣的主題</span></div>
+          </div>
+          <div class="card">
+              <div class="icon">🕹️</div>
+              <div class="meta"><span class="label">技能學習</span><span class="sub">隨時挑戰新技能</span></div>
+          </div>
+          <div class="card">
+              <div class="icon">🏆</div>
+              <div class="meta"><span class="label">成就系統</span><span class="sub">看見學習的足跡</span></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="mascot-wrap" aria-hidden="true">
-      <img src="assets/mascot.png" alt="平台吉祥物" class="mascot" />
+      <div class="mascot-wrap">
+        <img src="assets/mascot.png" alt="平台吉祥物" class="mascot" onerror="this.style.display='none'" />
+      </div>
     </div>
   </div>
-</div>
 
   <div class="container">
-    <!-- 專題卡片 -->
     <div class="section-title">App Inventor</div>
 
     <div class="card-grid">
@@ -316,16 +268,16 @@
         <div class="project-cover" style="background-image: url('https://placehold.co/600x400?text=App+Inventor');"></div>
         <div class="project-content">
           <div class="project-title">App Inventor 遊戲製作</div>
-          <div class="project-desc">從零開始打造屬於你的互動遊戲，逐步學習程式邏輯與介面設計。</div>
+          <div class="project-desc">從零開始打造屬於你的互動遊戲,逐步學習程式邏輯與介面設計。</div>
           <button class="project-btn" onclick="enterProject('appinventor')">開始學習</button>
         </div>
       </div>
 
       <div class="project-card">
-        <div class="project-cover" style="background-image: url('https://placehold.co/600x400?text=App+Inventor');"></div>
+        <div class="project-cover" style="background-image: url('https://placehold.co/600x400?text=Scratch');"></div>
         <div class="project-content">
           <div class="project-title">Scratch 遊戲製作</div>
-          <div class="project-desc">從零開始打造屬於你的互動遊戲，逐步學習程式邏輯與介面設計。</div>
+          <div class="project-desc">從零開始打造屬於你的互動遊戲,逐步學習程式邏輯與介面設計。</div>
           <button class="project-btn" onclick="enterProject('scratch')">開始學習</button>
         </div>
       </div>
@@ -333,58 +285,201 @@
   </div>
 
   <footer>
-    聯絡方式：xxx@school.edu.tw ｜ 指導單位：XXX小學資訊組<br>
+    聯絡方式:xxx@school.edu.tw ｜ 指導單位:XXX小學資訊組<br>
     © 2025 PBL 自主學習平台
   </footer>
 
   <script>
-    // 檢查登入狀態
-    window.onload = function() {
-        const currentUser = localStorage.getItem('currentUser');
-        
-        if (currentUser) {
-        const user = JSON.parse(currentUser);
-        updateUIAfterLogin(user);
+    // 🔥 Google Apps Script API 網址
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylzRtYbCD7u5VTK_8hUW8HUbFN1MG6PfPV7Cd1j8fyPMUsICuqNcyc5QZwYEtXhvTY/exec';
+    
+    // 🔥 全域變數:當前使用者
+    let currentUser = null;
+    
+    // ============================================
+    // 📌 1. 頁面載入時執行
+    // ============================================
+    window.onload = async function() {
+      console.log('🔄 頁面載入中...');
+      
+      // 讀取 localStorage 中的使用者資料
+      const userData = localStorage.getItem('currentUser');
+      
+      if (userData) {
+        try {
+          currentUser = JSON.parse(userData);
+          console.log('✅ 找到使用者:', currentUser.displayName);
+          
+          // 先用 localStorage 的資料更新 UI (快速顯示)
+          updateUIAfterLogin(currentUser);
+          
+          // 再從 Google Sheet 讀取最新統計資料
+          await updateUserStats();
+          
+        } catch (e) {
+          console.error('❌ 讀取使用者資料失敗:', e);
+          localStorage.removeItem('currentUser');
         }
+      } else {
+        console.log('ℹ️ 使用者未登入');
+      }
     };
     
-    // 更新 UI 顯示使用者資訊
+    // ============================================
+    // 📌 2. 更新 UI 顯示使用者資訊
+    // ============================================
     function updateUIAfterLogin(user) {
-        const navRight = document.querySelector('.nav-right');
-        navRight.innerHTML = `
+      const navRight = document.getElementById('navRight');
+      navRight.innerHTML = `
         <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="${user.avatar}" alt="avatar" 
-                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
-            <div style="color: white; text-align: left;">
+          <img src="${user.avatar}" alt="avatar" 
+               style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
+          <div style="color: white; text-align: left;">
             <div style="font-weight: bold; font-size: 14px;">${user.displayName}</div>
-            <div style="font-size: 11px; opacity: 0.85;">完成 ${user.completedCourses} 課程</div>
+            <div style="font-size: 11px; opacity: 0.85;" id="statsText">
+              完成 ${user.completedCourses || 0} 課程
+              <span class="loading-stats" id="loadingStats">載入中...</span>
             </div>
-            <button class="nav-btn" onclick="logout()" style="background: rgba(255,255,255,0.1);">
+          </div>
+          <button class="nav-btn" onclick="logout()" style="background: rgba(255,255,255,0.1);">
             登出
-            </button>
+          </button>
         </div>
-        `;
+      `;
     }
     
-    // 登出功能
-    function logout() {
-        if (confirm('確定要登出嗎？')) {
-        localStorage.removeItem('currentUser');
-        location.reload();
+    // ============================================
+    // 📌 3. 從 Google Sheet 讀取最新統計資料
+    // ============================================
+    async function updateUserStats() {
+      if (!currentUser) return;
+      
+      console.log('🔄 從 Google Sheet 讀取統計資料...');
+      
+      try {
+        const response = await makeRequest({
+          action: 'getUserStats',
+          userId: currentUser.userId
+        });
+        
+        if (response.success) {
+          console.log('✅ 統計資料:', response.data);
+          
+          // 更新使用者資料
+          currentUser.completedCourses = response.data.completedCourses || 0;
+          currentUser.totalHours = response.data.totalHours || 0;
+          
+          // 儲存回 localStorage
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          
+          // 更新 UI 顯示
+          const statsText = document.getElementById('statsText');
+          if (statsText) {
+            statsText.innerHTML = `完成 ${currentUser.completedCourses} 課程 | ${currentUser.totalHours}h`;
+          }
+          
+          // 移除載入中提示
+          const loadingStats = document.getElementById('loadingStats');
+          if (loadingStats) {
+            loadingStats.remove();
+          }
+          
+        } else {
+          console.error('❌ 讀取統計失敗:', response.error);
         }
+        
+      } catch (error) {
+        console.error('❌ 讀取統計失敗:', error);
+        
+        // 移除載入中提示
+        const loadingStats = document.getElementById('loadingStats');
+        if (loadingStats) {
+          loadingStats.textContent = '(離線資料)';
+        }
+      }
     }
     
+    // ============================================
+    // 📌 4. JSONP 請求函數
+    // ============================================
+    function makeRequest(data) {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        
+        window[callbackName] = function(response) {
+          console.log('📥 API 回應:', response);
+          delete window[callbackName];
+          if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          resolve(response);
+        };
+        
+        const params = new URLSearchParams({
+          callback: callbackName,
+          ...data
+        });
+        
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        script.onerror = (error) => {
+          console.error('❌ JSONP 載入失敗:', error);
+          delete window[callbackName];
+          if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          reject(new Error('請求失敗'));
+        };
+        
+        document.body.appendChild(script);
+        
+        setTimeout(() => {
+          if (window[callbackName]) {
+            console.error('⏱️ JSONP 請求超時');
+            delete window[callbackName];
+            if (script && script.parentNode) {
+              script.parentNode.removeChild(script);
+            }
+            reject(new Error('請求超時'));
+          }
+        }, 15000);
+      });
+    }
+    
+    // ============================================
+    // 📌 5. 進入專案
+    // ============================================
     function enterProject(projectId) {
-    // 檢查是否已登入
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-        alert('請先登入才能開始學習！');
+      if (!currentUser) {
+        alert('請先登入才能開始學習!');
         window.location.href = 'login.html';
         return;
+      }
+      
+      window.location.href = `learning.html?project=${projectId}`;
     }
     
-    // 跳轉到學習頁面,帶上專案 ID
-    window.location.href = `learning.html?project=${projectId}`;
+    // ============================================
+    // 📌 6. 前往學習分析頁面
+    // ============================================
+    function goToDashboard() {
+      if (!currentUser) {
+        alert('請先登入才能查看學習分析!');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      window.location.href = 'dashboard.html';
+    }
+    
+    // ============================================
+    // 📌 7. 登出
+    // ============================================
+    function logout() {
+      if (confirm('確定要登出嗎?')) {
+        localStorage.removeItem('currentUser');
+        location.reload();
+      }
     }
   </script>
 </body>

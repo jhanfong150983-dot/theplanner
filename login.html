@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THE PLANNER 學習網</title>
+  <title>登入 - THE PLANNER 學習網</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -314,12 +314,16 @@
   </div>
 
   <script>
-    // Google Apps Script API 網址 (請確認這是最新部署的網址)
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4H6gGKlT_9R79uO6rbtUY_3p25kEM3gzwJ-5iXLbgXK8ixEJvZ5Xs_Qywqj2GEr5I/exec';
+    // ============================================
+    // 🔥 重要:請更新為你最新部署的 Apps Script 網址
+    // ============================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbylzRtYbCD7u5VTK_8hUW8HUbFN1MG6PfPV7Cd1j8fyPMUsICuqNcyc5QZwYEtXhvTY/exec';
     
-    console.log('使用的 API 網址:', SCRIPT_URL);
+    console.log('🔗 使用的 API 網址:', SCRIPT_URL);
     
-    // 顯示錯誤訊息
+    // ============================================
+    // 📌 顯示錯誤訊息
+    // ============================================
     function showError(message) {
       const errorDiv = document.getElementById('errorMessage');
       errorDiv.textContent = message;
@@ -329,7 +333,9 @@
       }, 5000);
     }
     
-    // 解析 JWT Token
+    // ============================================
+    // 📌 解析 JWT Token
+    // ============================================
     function parseJwt(token) {
       try {
         const base64Url = token.split('.')[1];
@@ -339,20 +345,20 @@
         ).join(''));
         return JSON.parse(jsonPayload);
       } catch (e) {
-        console.error('JWT 解析失敗:', e);
+        console.error('❌ JWT 解析失敗:', e);
         return null;
       }
     }
     
-    // 使用 JSONP 方式發送請求 (繞過 CORS)
+    // ============================================
+    // 📌 JSONP 請求函數
+    // ============================================
     function makeRequest(data) {
       return new Promise((resolve, reject) => {
-        // 創建唯一的回調函數名稱
         const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
         
-        // 將回調函數掛載到 window
         window[callbackName] = function(response) {
-          console.log('JSONP 回應:', response);
+          console.log('📥 JSONP 回應:', response);
           delete window[callbackName];
           if (script && script.parentNode) {
             script.parentNode.removeChild(script);
@@ -360,17 +366,15 @@
           resolve(response);
         };
         
-        // 構建 URL 參數
         const params = new URLSearchParams({
           callback: callbackName,
           ...data
         });
         
-        // 創建 script 標籤
         const script = document.createElement('script');
         script.src = `${SCRIPT_URL}?${params.toString()}`;
         script.onerror = (error) => {
-          console.error('JSONP 載入失敗:', error);
+          console.error('❌ JSONP 載入失敗:', error);
           delete window[callbackName];
           if (script && script.parentNode) {
             script.parentNode.removeChild(script);
@@ -380,10 +384,9 @@
         
         document.body.appendChild(script);
         
-        // 超時處理 (15秒)
         setTimeout(() => {
           if (window[callbackName]) {
-            console.error('JSONP 請求超時');
+            console.error('⏱️ JSONP 請求超時');
             delete window[callbackName];
             if (script && script.parentNode) {
               script.parentNode.removeChild(script);
@@ -394,15 +397,15 @@
       });
     }
     
-    // Google 登入回調函數
+    // ============================================
+    // 📌 Google 登入回調函數
+    // ============================================
     async function handleCredentialResponse(response) {
-      console.log('收到 Google 登入回應');
+      console.log('🔐 收到 Google 登入回應');
       
-      // 顯示載入狀態
       document.getElementById('loadingState').classList.add('active');
       
       try {
-        // 解析使用者資訊
         const userInfo = parseJwt(response.credential);
         
         if (!userInfo) {
@@ -415,19 +418,19 @@
         const name = userInfo.name;
         const avatar = userInfo.picture;
         
-        console.log('Google 登入成功:', { email, name });
+        console.log('✅ Google 登入成功:', { email, name });
         
-        // 使用 JSONP 方式檢查使用者
-        console.log('開始檢查使用者...');
+        // 檢查使用者是否存在
+        console.log('🔍 檢查使用者...');
         const checkData = await makeRequest({
           action: 'checkUser',
           email: email
         });
-        console.log('檢查使用者回應:', checkData);
+        console.log('📋 檢查結果:', checkData);
         
         if (checkData.success && checkData.data && checkData.data.exists) {
-          // 已註冊使用者
-          console.log('使用者已存在,準備登入...');
+          // ✅ 已註冊使用者 - 直接登入
+          console.log('👤 使用者已存在,準備登入...');
           const userData = {
             userId: checkData.data.userId,
             email: email,
@@ -437,16 +440,14 @@
             totalHours: checkData.data.totalHours || 0
           };
           
-          // 儲存到 localStorage
           localStorage.setItem('currentUser', JSON.stringify(userData));
           
-          // 跳轉到首頁
           alert(`歡迎回來,${userData.displayName}!`);
           window.location.href = 'index.html';
           
         } else {
-          // 新使用者,註冊
-          console.log('新使用者,開始註冊...');
+          // ✨ 新使用者 - 註冊
+          console.log('📝 新使用者,開始註冊...');
           const registerData = await makeRequest({
             action: 'registerUser',
             email: email,
@@ -454,7 +455,7 @@
             displayName: name,
             avatar: avatar
           });
-          console.log('註冊回應:', registerData);
+          console.log('📋 註冊結果:', registerData);
           
           if (registerData.success) {
             const userData = {
@@ -466,28 +467,28 @@
               totalHours: 0
             };
             
-            // 儲存到 localStorage
             localStorage.setItem('currentUser', JSON.stringify(userData));
             
-            // 跳轉到首頁
             alert(`🎉 歡迎加入 PBL 自主學習平台,${name}!`);
             window.location.href = 'index.html';
           } else {
-            showError('註冊失敗,請稍後再試');
+            showError('註冊失敗: ' + (registerData.message || '請稍後再試'));
           }
         }
         
       } catch (error) {
-        console.error('登入處理失敗:', error);
+        console.error('❌ 登入處理失敗:', error);
         showError('登入過程發生錯誤: ' + error.message);
       } finally {
         document.getElementById('loadingState').classList.remove('active');
       }
     }
     
-    // 頁面載入時初始化
+    // ============================================
+    // 📌 頁面載入時初始化
+    // ============================================
     window.onload = function() {
-      console.log('頁面載入完成,初始化 Google 登入...');
+      console.log('🔄 頁面載入完成,初始化 Google 登入...');
       
       // 檢查是否已登入
       const currentUser = localStorage.getItem('currentUser');
@@ -519,7 +520,9 @@
       }
     };
     
-    // 初始化 Google 登入
+    // ============================================
+    // 📌 初始化 Google 登入
+    // ============================================
     function initializeGoogleLogin() {
       try {
         google.accounts.id.initialize({
@@ -539,9 +542,9 @@
           }
         );
         
-        console.log('Google 登入按鈕已渲染');
+        console.log('✅ Google 登入按鈕已渲染');
       } catch (error) {
-        console.error('初始化 Google 登入失敗:', error);
+        console.error('❌ 初始化 Google 登入失敗:', error);
         showError('初始化登入服務失敗: ' + error.message);
       }
     }

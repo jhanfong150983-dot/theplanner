@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>THE PLANNER 學習網</title>
-  <script src="courses.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
@@ -129,12 +128,12 @@
       padding: 30px 20px;
       position: relative;
       image-rendering: pixelated;
-      opacity: 0; /* 🔥 預設隱藏 */
-      transition: opacity 0.5s ease; /* 🔥 淡入效果 */
+      opacity: 0;
+      transition: opacity 0.5s ease;
     }
 
     .skill-tree-section.loaded {
-      opacity: 1; /* 🔥 載入完成後顯示 */
+      opacity: 1;
     }
 
     /* 右側內容區域 */
@@ -247,7 +246,6 @@
       image-rendering: pixelated;
     }
 
-    /* 八位元風格邊框效果 */
     .skill-circle::before {
       content: '';
       position: absolute;
@@ -260,7 +258,6 @@
       pointer-events: none;
     }
 
-    /* 支線技能圓圈 - 較小 */
     .skill-circle.side {
       width: 90px;
       height: 90px;
@@ -269,7 +266,6 @@
       border-width: 5px;
     }
 
-    /* 鎖定狀態 - 石頭質感 */
     .skill-circle.locked {
       background: 
         linear-gradient(135deg, 
@@ -299,7 +295,6 @@
       filter: drop-shadow(2px 2px 0px rgba(0,0,0,0.8));
     }
 
-    /* 主線可用狀態 - 金色寶箱風格 */
     .skill-circle.available {
       background: 
         linear-gradient(135deg, 
@@ -319,7 +314,6 @@
         inset 0 2px 10px rgba(255,255,255,0.5);
     }
 
-    /* 支線可用狀態 - 紫色魔法風格 */
     .skill-circle.side.available {
       background: 
         linear-gradient(135deg, 
@@ -338,7 +332,6 @@
         inset 0 2px 10px rgba(255,255,255,0.3);
     }
 
-    /* 主線已完成 - 閃亮金色 */
     .skill-circle.completed {
       background: 
         radial-gradient(circle at 30% 30%, 
@@ -373,7 +366,6 @@
       box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
     }
 
-    /* 支線已完成 - 閃亮紫色 */
     .skill-circle.side.completed {
       background: 
         radial-gradient(circle at 30% 30%, 
@@ -713,381 +705,290 @@
 
     /* 懸浮視窗遮罩 */
     .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    animation: fadeIn 0.3s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
     }
 
     .modal-overlay.active {
-    display: flex;
+      display: flex;
     }
 
     @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     /* 懸浮視窗內容 */
     .modal-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 20px;
-    padding: 40px;
-    text-align: center;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     }
 
     @keyframes modalPop {
-    0% {
+      0% {
         transform: scale(0.5) rotate(-5deg);
         opacity: 0;
-    }
-    100% {
+      }
+      100% {
         transform: scale(1) rotate(0);
         opacity: 1;
-    }
+      }
     }
 
     .modal-icon {
-    font-size: 100px;
-    margin-bottom: 20px;
-    animation: bounce 1s infinite;
+      font-size: 100px;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite;
     }
 
     @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
     }
 
     .modal-title {
-    font-size: 36px;
-    font-weight: bold;
-    color: white;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      font-size: 36px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 15px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .modal-message {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.95);
-    margin-bottom: 30px;
-    line-height: 1.6;
+      font-size: 20px;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 30px;
+      line-height: 1.6;
     }
 
     .modal-btn {
-    background: white;
-    color: #667eea;
-    border: none;
-    padding: 15px 40px;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .modal-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     /* 煙火特效 */
     .firework {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    animation: fireworkAnim 1s ease-out forwards;
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      animation: fireworkAnim 1s ease-out forwards;
     }
 
     @keyframes fireworkAnim {
-    0% {
+      0% {
         transform: translate(0, 0);
         opacity: 1;
-    }
-    100% {
+      }
+      100% {
         transform: translate(var(--tx), var(--ty));
         opacity: 0;
-    }
+      }
     }
 
     /* 星星飄落特效 */
     .star {
-    position: absolute;
-    font-size: 20px;
-    animation: starFall 2s ease-in-out infinite;
-    opacity: 0;
+      position: absolute;
+      font-size: 20px;
+      animation: starFall 2s ease-in-out infinite;
+      opacity: 0;
     }
 
     @keyframes starFall {
-    0% {
+      0% {
         top: -20px;
         opacity: 0;
-    }
-    50% {
+      }
+      50% {
         opacity: 1;
-    }
-    100% {
+      }
+      100% {
         top: 100%;
         opacity: 0;
-    }
+      }
     }
 
     /* 失敗懸浮視窗 */
     .modal-content.fail {
-    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+      background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
     }
 
     .modal-content.fail .modal-icon {
-    animation: shake 0.5s infinite;
+      animation: shake 0.5s infinite;
     }
 
     @keyframes shake {
-    0%, 100% { transform: translateX(0) rotate(0deg); }
-    25% { transform: translateX(-10px) rotate(-5deg); }
-    75% { transform: translateX(10px) rotate(5deg); }
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-10px) rotate(-5deg); }
+      75% { transform: translateX(10px) rotate(5deg); }
     }
 
     /* 雨滴特效 */
     .raindrop {
-    position: absolute;
-    width: 2px;
-    height: 20px;
-    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
-    animation: rainFall 1s linear infinite;
-    opacity: 0.7;
+      position: absolute;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
+      animation: rainFall 1s linear infinite;
+      opacity: 0.7;
     }
 
     @keyframes rainFall {
-    0% {
+      0% {
         top: -20px;
         opacity: 0.7;
-    }
-    100% {
+      }
+      100% {
         top: 100%;
         opacity: 0;
-    }
+      }
     }
 
     /* 碎片特效 */
     .fragment {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.8);
-    animation: fragmentFall 2s ease-in forwards;
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.8);
+      animation: fragmentFall 2s ease-in forwards;
     }
 
     @keyframes fragmentFall {
-    0% {
+      0% {
         transform: translate(0, 0) rotate(0deg);
         opacity: 1;
-    }
-    100% {
+      }
+      100% {
         transform: translate(var(--fx), var(--fy)) rotate(var(--fr));
         opacity: 0;
-    }
+      }
     }
 
-        /* 載入遮罩 */
+    /* 載入遮罩 */
     .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
     }
 
     .loading-overlay.fade-out {
-    opacity: 0;
-    pointer-events: none;
+      opacity: 0;
+      pointer-events: none;
     }
 
     .loading-spinner {
-    width: 80px;
-    height: 80px;
-    border: 8px solid rgba(255, 255, 255, 0.2);
-    border-top: 8px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+      width: 80px;
+      height: 80px;
+      border: 8px solid rgba(255, 255, 255, 0.2);
+      border-top: 8px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .loading-text {
-    margin-top: 20px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    animation: pulse-text 1.5s ease-in-out infinite;
+      margin-top: 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      animation: pulse-text 1.5s ease-in-out infinite;
     }
 
     @keyframes pulse-text {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
 
     .loading-logo {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 30px;
-    animation: float-logo 2s ease-in-out infinite;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      animation: float-logo 2s ease-in-out infinite;
     }
 
     @keyframes float-logo {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-15px); }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
     }
-
   </style>
 </head>
 <body>
-    <!-- 🔥 載入遮罩 -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <img src="assets/logo.png" alt="Logo" class="loading-logo" 
-            onerror="this.style.display='none'">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">載入學習進度中...</div>
-    </div>
-    <header>
+  <!-- 載入遮罩 -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <img src="assets/logo.png" alt="Logo" class="loading-logo" 
+        onerror="this.style.display='none'">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">載入學習進度中...</div>
+  </div>
+
+  <header>
     <nav class="nav-left">
-        <a href="index.html" class="logo-link">
+      <a href="index.html" class="logo-link">
         <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto; image-rendering:pixelated;" onerror="this.style.display='none'">
-        </a>
-        <button class="nav-btn" onclick="location.href='index.html'">主線任務</button>
-        <button class="nav-btn">支線任務</button>
-        <button class="nav-btn">學習紀錄</button>
+      </a>
+      <button class="nav-btn" onclick="location.href='index.html'">主線任務</button>
+      <button class="nav-btn">支線任務</button>
+      <button class="nav-btn">學習紀錄</button>
     </nav>
 
-    <!-- 🔥 加入 id="headerNav" -->
     <div class="nav-right" id="headerNav">
-        <button class="auth-btn register-btn">註冊</button>
-        <button class="auth-btn login-btn">登入</button>
+      <button class="auth-btn register-btn">註冊</button>
+      <button class="auth-btn login-btn">登入</button>
     </div>
-    </header>
+  </header>
 
   <div class="main-container">
     <!-- 左側：技能樹 -->
     <div class="skill-tree-section">
-      <div class="tree-title"> App Inventor 遊戲製作</div>
+      <div class="tree-title">App Inventor 遊戲製作</div>
       
       <!-- SVG 連接線 -->
       <svg class="connections-svg" id="connectionsSvg"></svg>
 
       <div class="skill-tree" id="skillTree">
-        <!-- 第一層（最底層）：基礎介紹 -->
-        <div class="skill-layer">
-          <div class="mainline">
-            <div class="skill-node" data-id="1">
-              <div class="skill-circle available" onclick="openSkill(1)">
-                基礎介紹
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 第二層：介面設計 + 音效設計（支線） -->
-        <div class="skill-layer">
-          <div class="sideline-layer">
-            <div class="side-branches">
-              <div class="skill-node" data-id="3">
-                <div class="skill-circle side locked" onclick="openSkill(3)">
-                  音效設計
-                </div>
-              </div>
-            </div>
-            
-            <div class="mainline">
-              <div class="skill-node" data-id="2">
-                <div class="skill-circle locked" onclick="openSkill(2)">
-                  介面設計
-                </div>
-              </div>
-            </div>
-            
-            <div style="width: 85px;"></div>
-          </div>
-        </div>
-
-        <!-- 第三層：程式邏輯 + 資料儲存（支線） -->
-        <div class="skill-layer">
-          <div class="sideline-layer">
-            <div style="width: 85px;"></div>
-            
-            <div class="mainline">
-              <div class="skill-node" data-id="4">
-                <div class="skill-circle locked" onclick="openSkill(4)">
-                  程式邏輯
-                </div>
-              </div>
-            </div>
-            
-            <div class="side-branches">
-              <div class="skill-node" data-id="5">
-                <div class="skill-circle side locked" onclick="openSkill(5)">
-                  資料儲存
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 第四層：遊戲製作 + 進階音效（支線的支線） -->
-        <div class="skill-layer">
-          <div class="sideline-layer">
-            <div class="side-branches">
-              <div class="skill-node" data-id="8">
-                <div class="skill-circle side locked" onclick="openSkill(8)">
-                  進階音效
-                </div>
-              </div>
-            </div>
-            
-            <div class="mainline">
-              <div class="skill-node" data-id="6">
-                <div class="skill-circle locked" onclick="openSkill(6)">
-                  遊戲製作
-                </div>
-              </div>
-            </div>
-            
-            <div style="width: 85px;"></div>
-          </div>
-        </div>
-
-        <!-- 第五層：專題發表 -->
-        <div class="skill-layer">
-          <div class="mainline">
-            <div class="skill-node" data-id="7">
-              <div class="skill-circle locked" onclick="openSkill(7)">
-                專題發表
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- 🔥 技能樹將由 JavaScript 動態生成 -->
       </div>
-    </div>
 
     <!-- 右側：內容區域 -->
     <div class="content-section" id="contentSection">
@@ -1152,480 +1053,716 @@
   </div>
 
   <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz4H6gGKlT_9R79uO6rbtUY_3p25kEM3gzwJ-5iXLbgXK8ixEJvZ5Xs_Qywqj2GEr5I/exec';
+    // ============================================
+    // 🔥 主要修正：API 和資料結構對應
+    // ============================================
 
-  // ✅ 從 URL 取得專案 ID
-  const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get('project') || 'appinventor';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAf9WAg_Mn9k6_hFdj3eLhPzcyYnZReM7Je2sEQznq2lDnKHZQsy2xyPKGK8bhNqBL/exec';
 
-  // ✅ 檢查課程是否存在
-  if (!COURSES[projectId]) {
-    alert('找不到此課程！');
-    window.location.href = 'index.html';
-  }
+    // 從 URL 取得專案 ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project') || 'appinventor';
 
-  // ✅ 載入課程資料
-  const currentCourse = COURSES[projectId];
-  const skills = currentCourse.skills;
-  const connections = currentCourse.connections;
-  const unlockMap = currentCourse.unlockMap;
-  const prerequisites = currentCourse.prerequisites;
+    // 載入課程資料
+    let currentCourse = null;
+    let skills = {};
+    let connections = [];
+    let unlockMap = {};
+    let prerequisites = {};
 
-  // ✅ 設定課程標題
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('.tree-title').textContent = currentCourse.title;
-  });
-
-  // ✅ 取得當前登入使用者
-  let currentUser = null;
-  try {
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      currentUser = JSON.parse(userData);
-      console.log('✅ 讀取到使用者:', currentUser);
-    } else {
-      console.log('⚠️ localStorage 中沒有 currentUser');
+    // 取得當前登入使用者
+    // 使用者資料
+    let currentUser = null;
+    try {
+      const userData = localStorage.getItem('currentUser');
+      if (userData) {
+        currentUser = JSON.parse(userData);
+        console.log('✅ 讀取到使用者:', currentUser);
+      }
+    } catch (e) {
+      console.error('❌ 讀取使用者失敗:', e);
     }
-  } catch (e) {
-    console.error('❌ 讀取使用者失敗:', e);
-  }
 
-  // ✅ makeRequest 函數
-  function makeRequest(data) {
-    return new Promise((resolve, reject) => {
-      const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
-      
-      window[callbackName] = function(response) {
-        console.log('API 回應:', response);
-        delete window[callbackName];
-        if (script && script.parentNode) {
-          script.parentNode.removeChild(script);
-        }
-        resolve(response);
-      };
-      
-      const params = new URLSearchParams({
-        callback: callbackName,
-        ...data
-      });
-      
-      const script = document.createElement('script');
-      script.src = `${SCRIPT_URL}?${params.toString()}`;
-      script.onerror = () => {
-        delete window[callbackName];
-        reject(new Error('請求失敗'));
-      };
-      
-      document.body.appendChild(script);
-      
-      setTimeout(() => {
-        if (window[callbackName]) {
+    // 🔥 修正：makeRequest 函數
+    function makeRequest(data) {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        
+        window[callbackName] = function(response) {
+          console.log('API 回應:', response);
           delete window[callbackName];
-          reject(new Error('請求超時'));
+          if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+          resolve(response);
+        };
+        
+        const params = new URLSearchParams({
+          callback: callbackName,
+          ...data
+        });
+        
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${params.toString()}`;
+        script.onerror = () => {
+          delete window[callbackName];
+          reject(new Error('請求失敗'));
+        };
+        
+        document.body.appendChild(script);
+        
+        setTimeout(() => {
+          if (window[callbackName]) {
+            delete window[callbackName];
+            reject(new Error('請求超時'));
+          }
+        }, 15000);
+      });
+    }
+
+    // 全域變數
+    let currentSkillId = null;
+    let userAnswers = [];
+    let completedSkills = new Set();
+    let currentAttempts = 1;
+    let videoWatched = false;
+    let quizStartTime = null;
+
+    // 繪製連接線
+    function drawConnections() {
+      const svg = document.getElementById('connectionsSvg');
+      svg.innerHTML = '';
+      
+      const treeSection = document.querySelector('.skill-tree-section');
+      svg.style.width = treeSection.scrollWidth + 'px';
+      svg.style.height = treeSection.scrollHeight + 'px';
+      
+      connections.forEach(conn => {
+        const fromNode = document.querySelector(`[data-id="${conn.from}"]`);
+        const toNode = document.querySelector(`[data-id="${conn.to}"]`);
+        
+        if (!fromNode || !toNode) return;
+        
+        const fromCircle = fromNode.querySelector('.skill-circle');
+        const toCircle = toNode.querySelector('.skill-circle');
+        
+        if (!fromCircle || !toCircle) return;
+        
+        const fromRect = fromCircle.getBoundingClientRect();
+        const toRect = toCircle.getBoundingClientRect();
+        const containerRect = treeSection.getBoundingClientRect();
+        
+        const x1 = fromRect.left + fromRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+        const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + treeSection.scrollTop;
+        const x2 = toRect.left + toRect.width / 2 - containerRect.left + treeSection.scrollLeft;
+        const y2 = toRect.top + toRect.height / 2 - containerRect.top + treeSection.scrollTop;
+        
+        const glow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        glow.setAttribute('x1', x1);
+        glow.setAttribute('y1', y1);
+        glow.setAttribute('x2', x2);
+        glow.setAttribute('y2', y2);
+        glow.setAttribute('stroke', conn.type === 'main' ? '#ffd700' : '#a855f7');
+        glow.setAttribute('stroke-width', conn.type === 'main' ? '12' : '8');
+        glow.setAttribute('opacity', '0.2');
+        glow.setAttribute('stroke-linecap', 'round');
+        glow.setAttribute('filter', 'blur(4px)');
+        svg.appendChild(glow);
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        
+        if (conn.type === 'main') {
+          line.setAttribute('stroke', '#ffd700');
+          line.setAttribute('stroke-width', '6');
+          line.setAttribute('stroke-dasharray', '10,5');
+        } else {
+          line.setAttribute('stroke', '#a855f7');
+          line.setAttribute('stroke-width', '4');
+          line.setAttribute('stroke-dasharray', '8,4');
         }
-      }, 15000);
+        
+        line.setAttribute('opacity', '0.7');
+        line.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(line);
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      setTimeout(drawConnections, 100);
     });
-  }
 
-  // ✅ 全域變數
-  let currentSkillId = null;
-  let userAnswers = [];
-  let completedSkills = new Set();
-  let currentAttempts = 1;
-  let videoWatched = false;  // 🔥 新增這個變數
+    // 🔥 修正：getCurrentTimeSlot 函數
+    function getCurrentTimeSlot() {
+      const hour = new Date().getHours();
+      if (hour >= 8 && hour < 12) return '08:00-12:00';
+      if (hour >= 12 && hour < 18) return '12:00-18:00';
+      if (hour >= 18 && hour < 24) return '18:00-24:00';
+      return '00:00-08:00';
+    }
 
-  // 繪製連接線
-  function drawConnections() {
-    const svg = document.getElementById('connectionsSvg');
-    svg.innerHTML = '';
-    
-    const treeSection = document.querySelector('.skill-tree-section');
-    svg.style.width = treeSection.scrollWidth + 'px';
-    svg.style.height = treeSection.scrollHeight + 'px';
-    
-    connections.forEach(conn => {
-      const fromNode = document.querySelector(`[data-id="${conn.from}"]`);
-      const toNode = document.querySelector(`[data-id="${conn.to}"]`);
+    // 開啟技能
+    function openSkill(id) {
+      const node = document.querySelector(`[data-id="${id}"]`);
+      const circle = node.querySelector('.skill-circle');
       
-      if (!fromNode || !toNode) return;
-      
-      const fromCircle = fromNode.querySelector('.skill-circle');
-      const toCircle = toNode.querySelector('.skill-circle');
-      
-      if (!fromCircle || !toCircle) return;
-      
-      const fromRect = fromCircle.getBoundingClientRect();
-      const toRect = toCircle.getBoundingClientRect();
-      const containerRect = treeSection.getBoundingClientRect();
-      
-      const x1 = fromRect.left + fromRect.width / 2 - containerRect.left + treeSection.scrollLeft;
-      const y1 = fromRect.top + fromRect.height / 2 - containerRect.top + treeSection.scrollTop;
-      const x2 = toRect.left + toRect.width / 2 - containerRect.left + treeSection.scrollLeft;
-      const y2 = toRect.top + toRect.height / 2 - containerRect.top + treeSection.scrollTop;
-      
-      const glow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      glow.setAttribute('x1', x1);
-      glow.setAttribute('y1', y1);
-      glow.setAttribute('x2', x2);
-      glow.setAttribute('y2', y2);
-      glow.setAttribute('stroke', conn.type === 'main' ? '#ffd700' : '#a855f7');
-      glow.setAttribute('stroke-width', conn.type === 'main' ? '12' : '8');
-      glow.setAttribute('opacity', '0.2');
-      glow.setAttribute('stroke-linecap', 'round');
-      glow.setAttribute('filter', 'blur(4px)');
-      svg.appendChild(glow);
-      
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', x1);
-      line.setAttribute('y1', y1);
-      line.setAttribute('x2', x2);
-      line.setAttribute('y2', y2);
-      
-      if (conn.type === 'main') {
-        line.setAttribute('stroke', '#ffd700');
-        line.setAttribute('stroke-width', '6');
-        line.setAttribute('stroke-dasharray', '10,5');
-      } else {
-        line.setAttribute('stroke', '#a855f7');
-        line.setAttribute('stroke-width', '4');
-        line.setAttribute('stroke-dasharray', '8,4');
+      if (circle.classList.contains('locked')) {
+        alert('請先完成前面的課程！');
+        return;
       }
       
-      line.setAttribute('opacity', '0.7');
-      line.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(line);
-    });
-  }
-
-  window.addEventListener('resize', () => {
-    setTimeout(drawConnections, 100);
-  });
-
-  function openSkill(id) {
-    const node = document.querySelector(`[data-id="${id}"]`);
-    const circle = node.querySelector('.skill-circle');
-    
-    if (circle.classList.contains('locked')) {
-      alert('請先完成前面的課程！');
-      return;
-    }
-    
-    currentSkillId = id;
-    videoWatched = false;
-    window.skillStartTime = new Date();
-    currentAttempts = 1;
-    
-    document.getElementById('welcomeMessage').style.display = 'none';
-    document.getElementById('videoStage').style.display = 'block';
-    document.getElementById('quizStage').classList.remove('active');
-    document.getElementById('quizStage').style.display = 'none';
-    document.getElementById('contentTitle').textContent = skills[id].name;
-    
-    loadYouTubeVideo(id);
-    
-    document.getElementById('resultMessage').innerHTML = '';
-    document.getElementById('contentSection').scrollTop = 0;
-  }
-
-  function loadYouTubeVideo(id) {
-    const videoContainer = document.querySelector('.video-container');
-    const skill = skills[id];
-    
-    if (skill.videoId) {
-      videoContainer.innerHTML = `
-        <iframe 
-          id="youtubePlayer"
-          width="100%" 
-          height="100%" 
-          src="https://www.youtube.com/embed/${skill.videoId}?enablejsapi=1&rel=0" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen
-          style="border-radius: 12px;">
-        </iframe>
-      `;
+      currentSkillId = id;
+      videoWatched = false;
+      window.skillStartTime = new Date();
+      currentAttempts = 1;
       
-      setTimeout(() => {
+      document.getElementById('welcomeMessage').style.display = 'none';
+      document.getElementById('videoStage').style.display = 'block';
+      document.getElementById('quizStage').classList.remove('active');
+      document.getElementById('quizStage').style.display = 'none';
+      document.getElementById('contentTitle').textContent = skills[id].name;
+      
+      loadYouTubeVideo(id);
+      
+      document.getElementById('resultMessage').innerHTML = '';
+      document.getElementById('contentSection').scrollTop = 0;
+    }
+
+    // 載入 YouTube 影片
+    function loadYouTubeVideo(id) {
+      const videoContainer = document.querySelector('.video-container');
+      const skill = skills[id];
+      
+      if (skill.videoId) {
+        videoContainer.innerHTML = `
+          <iframe 
+            id="youtubePlayer"
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/${skill.videoId}?enablejsapi=1&rel=0" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            style="border-radius: 12px;">
+          </iframe>
+        `;
+        
+        setTimeout(() => {
+          videoWatched = true;
+          updateContinueButton();
+        }, 5000);
+      } else {
+        videoContainer.innerHTML = `
+          <div class="video-placeholder">
+            <div style="font-size: 48px; margin-bottom: 15px;">🎬</div>
+            <div>教學影片預留區域</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">影片製作中...</div>
+          </div>
+        `;
+        
         videoWatched = true;
         updateContinueButton();
-      }, 5000);
-    } else {
-      videoContainer.innerHTML = `
-        <div class="video-placeholder">
-          <div style="font-size: 48px; margin-bottom: 15px;">🎬</div>
-          <div>教學影片預留區域</div>
-          <div style="font-size: 14px; color: #999; margin-top: 10px;">影片製作中...</div>
-        </div>
-      `;
+      }
       
-      videoWatched = true;
-      updateContinueButton();
-    }
-    
-    if (currentUser) {
-      makeRequest({
-        action: 'saveProgress',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        projectId: projectId,  // 🔥 加入 projectId
-        skillId: id,
-        skillName: skills[id].name,
-        skillType: skills[id].type,
-        startTime: window.skillStartTime.toLocaleString('zh-TW'),
-        status: 'started',
-        attempts: 1,
-        completeTime: '',
-        score: '',
-        learningMinutes: 0
-      }).then(() => {
-        console.log('✅ 已記錄開始學習');
-      }).catch(err => {
-        console.error('❌ 記錄失敗:', err);
-      });
-    }
-  }
-
-  function updateContinueButton() {
-    const continueBtn = document.querySelector('.continue-btn');
-    if (videoWatched) {
-      continueBtn.disabled = false;
-      continueBtn.style.opacity = '1';
-      continueBtn.style.cursor = 'pointer';
-    } else {
-      continueBtn.disabled = true;
-      continueBtn.style.opacity = '0.5';
-      continueBtn.style.cursor = 'not-allowed';
-    }
-  }
-
-  function startQuiz() {
-    if (!videoWatched) {
-      alert('請先觀看完教學影片！');
-      return;
+      // 🔥 修正：記錄學習開始（對應資料庫欄位）
+      if (currentUser) {
+        makeRequest({
+          action: 'saveProgress',
+          userId: currentUser.userId,
+          projectId: projectId,
+          skillId: id.toString(),
+          skillName: skills[id].name,
+          skillType: skills[id].type,
+          learningDate: new Date().toLocaleDateString('zh-TW'),
+          learningTimeSlot: getCurrentTimeSlot(),
+          learningMinutes: 0,
+          status: 'started'
+        }).then(() => {
+          console.log('✅ 已記錄開始學習');
+        }).catch(err => {
+          console.error('❌ 記錄失敗:', err);
+        });
+      }
     }
 
-    if (currentUser && window.skillStartTime) {
-      const watchDuration = Math.floor((new Date() - window.skillStartTime) / 1000);
+    function updateContinueButton() {
+      const continueBtn = document.querySelector('.continue-btn');
+      if (videoWatched) {
+        continueBtn.disabled = false;
+        continueBtn.style.opacity = '1';
+        continueBtn.style.cursor = 'pointer';
+      } else {
+        continueBtn.disabled = true;
+        continueBtn.style.opacity = '0.5';
+        continueBtn.style.cursor = 'not-allowed';
+      }
+    }
+
+    // 開始測驗
+    function startQuiz() {
+      quizStartTime = new Date();
       
-      makeRequest({
-        action: 'saveVideoWatch',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        videoId: currentSkillId,
-        videoTitle: skills[currentSkillId].name,
-        watchDuration: watchDuration,
-        totalDuration: watchDuration
-      }).then(() => {
-        console.log('✅ 已記錄影片觀看');
-      }).catch(err => {
-        console.error('❌ 記錄失敗:', err);
-      });
-    }
+      if (!videoWatched) {
+        alert('請先觀看完教學影片！');
+        return;
+      }
 
-    stopYouTubeVideo();
-    
-    document.getElementById('videoStage').style.display = 'none';
-    document.getElementById('quizStage').classList.add('active');
-    document.getElementById('quizStage').style.display = 'flex';
-    
-    const quiz = skills[currentSkillId].quiz;
-    let html = '';
-    
-    quiz.forEach((q, index) => {
-      html += `
-        <div class="question">
-          <div class="question-text">${index + 1}. ${q.q}</div>
-          <div class="options">
-            ${q.options.map((opt, i) => `
-              <div class="option" onclick="selectOption(${index}, ${i})">
-                <input type="radio" name="q${index}" value="${i}" id="q${index}_${i}">
-                ${opt}
-              </div>
-            `).join('')}
+      // 🔥 修正：記錄影片觀看（對應資料庫欄位）
+      if (currentUser && window.skillStartTime) {
+        makeRequest({
+          action: 'saveVideoWatch',
+          userId: currentUser.userId,
+          courseId: projectId,
+          videoId: currentSkillId.toString(),
+          watchDate: new Date().toLocaleString('zh-TW'),
+          watchCompletionRate: 100,
+          isRewatch: '否',
+          repeatCount: 1
+        }).then(() => {
+          console.log('✅ 已記錄影片觀看');
+        }).catch(err => {
+          console.error('❌ 記錄失敗:', err);
+        });
+      }
+
+      stopYouTubeVideo();
+      
+      document.getElementById('videoStage').style.display = 'none';
+      document.getElementById('quizStage').classList.add('active');
+      document.getElementById('quizStage').style.display = 'flex';
+      
+      const quiz = skills[currentSkillId].quiz;
+      let html = '';
+      
+      quiz.forEach((q, index) => {
+        html += `
+          <div class="question">
+            <div class="question-text">${index + 1}. ${q.q}</div>
+            <div class="options">
+              ${q.options.map((opt, i) => `
+                <div class="option" onclick="selectOption(${index}, ${i})">
+                  <input type="radio" name="q${index}" value="${i}" id="q${index}_${i}">
+                  ${opt}
+                </div>
+              `).join('')}
+            </div>
           </div>
-        </div>
-      `;
-    });
-    
-    document.getElementById('quizContent').innerHTML = html;
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('resultMessage').innerHTML = '';
-    userAnswers = new Array(quiz.length).fill(null);
-    document.getElementById('contentSection').scrollTop = 0;
-  }
-
-  function stopYouTubeVideo() {
-    const iframe = document.getElementById('youtubePlayer');
-    if (iframe) {
-      const videoContainer = document.querySelector('.video-container');
-      videoContainer.innerHTML = `
-        <div class="video-placeholder">
-          <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
-          <div>影片已停止</div>
-          <div style="font-size: 14px; color: #999; margin-top: 10px;">請完成評量</div>
-        </div>
-      `;
-    }
-  }
-
-  function selectOption(questionIndex, optionIndex) {
-    userAnswers[questionIndex] = optionIndex;
-    
-    const radioBtn = document.getElementById(`q${questionIndex}_${optionIndex}`);
-    if (radioBtn) {
-      radioBtn.checked = true;
-    }
-    
-    const options = document.querySelectorAll(`.question:nth-child(${questionIndex + 1}) .option`);
-    options.forEach((opt, i) => {
-      if (i === optionIndex) {
-        opt.classList.add('selected');
-      } else {
-        opt.classList.remove('selected');
-      }
-    });
-  }
-
-  function submitQuiz() {
-    const quiz = skills[currentSkillId].quiz;
-    
-    if (userAnswers.includes(null)) {
-      alert('請回答所有題目！');
-      return;
-    }
-
-    let correctCount = 0;
-    quiz.forEach((q, index) => {
-      const options = document.querySelectorAll(`.question:nth-child(${index + 1}) .option`);
-      if (userAnswers[index] === q.correct) {
-        correctCount++;
-        options[userAnswers[index]].classList.add('correct');
-      } else {
-        options[userAnswers[index]].classList.add('wrong');
-        options[q.correct].classList.add('correct');
-      }
-    });
-
-    const percentage = (correctCount / quiz.length) * 100;
-
-    if (currentUser) {
-      makeRequest({
-        action: 'saveQuizResult',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        quizId: currentSkillId,
-        quizName: skills[currentSkillId].name,
-        score: Math.round(percentage),
-        totalQuestions: quiz.length,
-        correctAnswers: correctCount
-      }).then(() => {
-        console.log('✅ 已記錄測驗結果');
-      }).catch(err => {
-        console.error('❌ 記錄失敗:', err);
-      });
-    }
-
-    if (percentage === 100) {
-      showSuccessModal();
-    } else {
-      currentAttempts++;
-      console.log(`嘗試次數: ${currentAttempts}`);
-      showFailModal(percentage);
-    }
-    
-    document.getElementById('submitBtn').disabled = true;
-  }
-
-  // ... 其他函數保持不變 (showSuccessModal, createFireworks, createStars, closeSuccessModal, showFailModal, createRaindrops, createFragments, closeFailModal, retryQuiz) ...
-
-  function completeSkill() {
-    const node = document.querySelector(`[data-id="${currentSkillId}"]`);
-    const circle = node.querySelector('.skill-circle');
-    circle.classList.remove('available');
-    circle.classList.add('completed');
-    completedSkills.add(currentSkillId);
-    
-    if (currentUser && window.skillStartTime) {
-      const completeTime = new Date();
-      const learningMinutes = Math.floor((completeTime - window.skillStartTime) / 60000);
-
-      makeRequest({
-        action: 'saveProgress',
-        userId: currentUser.userId,
-        email: currentUser.email,
-        projectId: projectId,  // 🔥 加入 projectId
-        skillId: currentSkillId,
-        skillName: skills[currentSkillId].name,
-        skillType: skills[currentSkillId].type,
-        startTime: window.skillStartTime.toLocaleString('zh-TW'),
-        completeTime: completeTime.toLocaleString('zh-TW'),
-        status: 'completed',
-        score: 100,
-        attempts: currentAttempts,
-        learningMinutes: learningMinutes
-      }).then(() => {
-        console.log('✅ 已記錄完成狀態');
+        `;
       });
       
-      makeRequest({
-        action: 'updateUserStats',
-        userId: currentUser.userId,
-        completedCourse: 'true',
-        learningMinutes: learningMinutes
-      }).then(() => {
-        console.log('✅ 已更新使用者統計');
+      document.getElementById('quizContent').innerHTML = html;
+      document.getElementById('submitBtn').disabled = false;
+      document.getElementById('resultMessage').innerHTML = '';
+      userAnswers = new Array(quiz.length).fill(null);
+      document.getElementById('contentSection').scrollTop = 0;
+    }
+
+    function stopYouTubeVideo() {
+      const iframe = document.getElementById('youtubePlayer');
+      if (iframe) {
+        const videoContainer = document.querySelector('.video-container');
+        videoContainer.innerHTML = `
+          <div class="video-placeholder">
+            <div style="font-size: 48px; margin-bottom: 15px;">✓</div>
+            <div>影片已停止</div>
+            <div style="font-size: 14px; color: #999; margin-top: 10px;">請完成評量</div>
+          </div>
+        `;
+      }
+    }
+
+    function selectOption(questionIndex, optionIndex) {
+      userAnswers[questionIndex] = optionIndex;
+      
+      const radioBtn = document.getElementById(`q${questionIndex}_${optionIndex}`);
+      if (radioBtn) {
+        radioBtn.checked = true;
+      }
+      
+      const options = document.querySelectorAll(`.question:nth-child(${questionIndex + 1}) .option`);
+      options.forEach((opt, i) => {
+        if (i === optionIndex) {
+          opt.classList.add('selected');
+        } else {
+          opt.classList.remove('selected');
+        }
       });
     }
-    
-    unlockNextSkills(currentSkillId);
-    drawConnections();
-    
-    document.getElementById('videoStage').style.display = 'none';
-    document.getElementById('quizStage').style.display = 'none';
-    document.getElementById('welcomeMessage').style.display = 'flex';
-    
-    currentSkillId = null;
-    userAnswers = [];
-  }
 
-  function unlockNextSkills(completedId) {
-    const toUnlock = unlockMap[completedId] || [];
-    toUnlock.forEach(id => {
-      const node = document.querySelector(`[data-id="${id}"]`);
-      if (node) {
-        const circle = node.querySelector('.skill-circle');
-        if (circle && circle.classList.contains('locked')) {
-          if (canUnlock(id)) {
+    // 🔥 修正：提交測驗
+    function submitQuiz() {
+      const quiz = skills[currentSkillId].quiz;
+      
+      if (userAnswers.includes(null)) {
+        alert('請回答所有題目！');
+        return;
+      }
+
+      let correctCount = 0;
+      quiz.forEach((q, index) => {
+        const options = document.querySelectorAll(`.question:nth-child(${index + 1}) .option`);
+        if (userAnswers[index] === q.correct) {
+          correctCount++;
+          options[userAnswers[index]].classList.add('correct');
+        } else {
+          options[userAnswers[index]].classList.add('wrong');
+          options[q.correct].classList.add('correct');
+        }
+      });
+
+      const percentage = (correctCount / quiz.length) * 100;
+      const answerDuration = quizStartTime ? Math.floor((new Date() - quizStartTime) / 60000) : 0;
+
+      // 🔥 修正：記錄測驗結果（對應資料庫欄位）
+      if (currentUser) {
+        makeRequest({
+          action: 'saveQuizResult',
+          userId: currentUser.userId,
+          courseId: projectId,
+          quizId: currentSkillId.toString(),
+          quizDate: new Date().toLocaleString('zh-TW'),
+          attemptNumber: currentAttempts,
+          score: Math.round(percentage),
+          totalScore: 100,
+          answerDuration: answerDuration,
+          passStatus: percentage === 100 ? '通過' : '未通過'
+        }).then(() => {
+          console.log('✅ 已記錄測驗結果');
+        }).catch(err => {
+          console.error('❌ 記錄失敗:', err);
+        });
+
+        // 🔥 新增：記錄每題測驗明細
+        quiz.forEach((q, index) => {
+          makeRequest({
+            action: 'saveQuizDetails',
+            quizRecordId: `QR${Date.now()}`, // 應該從 saveQuizResult 取得
+            questionId: `Q${index + 1}`,
+            questionType: '單選題',
+            knowledgePoint: skills[currentSkillId].name,
+            isCorrect: userAnswers[index] === q.correct ? '是' : '否',
+            studentAnswer: q.options[userAnswers[index]],
+            correctAnswer: q.options[q.correct]
+          }).catch(err => {
+            console.error('❌ 記錄題目明細失敗:', err);
+          });
+        });
+      }
+
+      if (percentage === 100) {
+        showSuccessModal();
+      } else {
+        currentAttempts++;
+        console.log(`嘗試次數: ${currentAttempts}`);
+        showFailModal(percentage);
+      }
+      
+      document.getElementById('submitBtn').disabled = true;
+    }
+
+    // 🔥 修正：完成技能
+    function completeSkill() {
+      const node = document.querySelector(`[data-id="${currentSkillId}"]`);
+      const circle = node.querySelector('.skill-circle');
+      circle.classList.remove('available');
+      circle.classList.add('completed');
+      completedSkills.add(currentSkillId);
+      
+      if (currentUser && window.skillStartTime) {
+        const completeTime = new Date();
+        const learningMinutes = Math.floor((completeTime - window.skillStartTime) / 60000);
+
+        // 🔥 修正：使用 updateSkillProgress 更新技能進度表
+        makeRequest({
+          action: 'updateSkillProgress',
+          userId: currentUser.userId,
+          skillId: currentSkillId.toString(),
+          skillName: skills[currentSkillId].name,
+          skillType: skills[currentSkillId].type,
+          status: '已完成',
+          completeDate: completeTime.toLocaleDateString('zh-TW'),
+          progressPercentage: 100
+        }).then(() => {
+          console.log('✅ 已記錄技能完成');
+        }).catch(err => {
+          console.error('❌ 記錄失敗:', err);
+        });
+
+        // 🔥 修正：更新學習記錄
+        makeRequest({
+          action: 'saveProgress',
+          userId: currentUser.userId,
+          projectId: projectId,
+          skillId: currentSkillId.toString(),
+          skillName: skills[currentSkillId].name,
+          skillType: skills[currentSkillId].type,
+          learningDate: new Date().toLocaleDateString('zh-TW'),
+          learningTimeSlot: getCurrentTimeSlot(),
+          learningMinutes: learningMinutes,
+          status: 'completed',
+          completeTime: completeTime.toLocaleDateString('zh-TW')
+        }).then(() => {
+          console.log('✅ 已更新學習記錄');
+        }).catch(err => {
+          console.error('❌ 更新失敗:', err);
+        });
+
+        // 🔥 修正：記錄每日學習
+        makeRequest({
+          action: 'saveDailyLearning',
+          userId: currentUser.userId,
+          dailyMinutes: learningMinutes,
+          streakDays: 1 // 需要計算連續天數
+        }).then(() => {
+          console.log('✅ 已記錄每日學習');
+        }).catch(err => {
+          console.error('❌ 記錄失敗:', err);
+        });
+      }
+      
+      unlockNextSkills(currentSkillId);
+      drawConnections();
+      
+      document.getElementById('videoStage').style.display = 'none';
+      document.getElementById('quizStage').style.display = 'none';
+      document.getElementById('welcomeMessage').style.display = 'flex';
+      
+      currentSkillId = null;
+      userAnswers = [];
+    }
+
+    function unlockNextSkills(completedId) {
+      const toUnlock = unlockMap[completedId] || [];
+      toUnlock.forEach(id => {
+        const node = document.querySelector(`[data-id="${id}"]`);
+        if (node) {
+          const circle = node.querySelector('.skill-circle');
+          if (circle && circle.classList.contains('locked')) {
+            if (canUnlock(id)) {
+              circle.classList.remove('locked');
+              circle.classList.add('available');
+            }
+          }
+        }
+      });
+    }
+
+    function canUnlock(skillId) {
+      const required = prerequisites[skillId] || [];
+      return required.every(id => completedSkills.has(id));
+    }
+
+    // 🔥 動態生成技能樹 HTML
+    function generateSkillTree() {
+      const skillTreeContainer = document.getElementById('skillTree');
+      skillTreeContainer.innerHTML = '';
+      
+      // 按層級分組技能
+      const layersMap = {};
+      Object.values(skills).forEach(skill => {
+        if (!layersMap[skill.layer]) {
+          layersMap[skill.layer] = [];
+        }
+        layersMap[skill.layer].push(skill);
+      });
+      
+      // 取得最大層級
+      const maxLayer = Math.max(...Object.keys(layersMap).map(Number));
+      
+      // 由下往上生成每一層（層級1在最下面）
+      for (let layer = 1; layer <= maxLayer; layer++) {
+        const layerSkills = layersMap[layer] || [];
+        
+        if (layerSkills.length === 0) continue;
+        
+        // 建立層級容器
+        const layerDiv = document.createElement('div');
+        layerDiv.className = 'skill-layer';
+        
+        // 按位置分組
+        const leftSkills = layerSkills.filter(s => s.position === 'left');
+        const centerSkills = layerSkills.filter(s => s.position === 'center');
+        const rightSkills = layerSkills.filter(s => s.position === 'right');
+        
+        // 如果有支線（左或右）
+        if (leftSkills.length > 0 || rightSkills.length > 0) {
+          const sidelineDiv = document.createElement('div');
+          sidelineDiv.className = 'sideline-layer';
+          
+          // 左側支線
+          if (leftSkills.length > 0) {
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'side-branches';
+            leftSkills.forEach(skill => {
+              leftDiv.appendChild(createSkillNode(skill));
+            });
+            sidelineDiv.appendChild(leftDiv);
+          } else {
+            const spacer = document.createElement('div');
+            spacer.style.width = '85px';
+            sidelineDiv.appendChild(spacer);
+          }
+          
+          // 中央主線
+          if (centerSkills.length > 0) {
+            const centerDiv = document.createElement('div');
+            centerDiv.className = 'mainline';
+            centerSkills.forEach(skill => {
+              centerDiv.appendChild(createSkillNode(skill));
+            });
+            sidelineDiv.appendChild(centerDiv);
+          }
+          
+          // 右側支線
+          if (rightSkills.length > 0) {
+            const rightDiv = document.createElement('div');
+            rightDiv.className = 'side-branches';
+            rightSkills.forEach(skill => {
+              rightDiv.appendChild(createSkillNode(skill));
+            });
+            sidelineDiv.appendChild(rightDiv);
+          } else {
+            const spacer = document.createElement('div');
+            spacer.style.width = '85px';
+            sidelineDiv.appendChild(spacer);
+          }
+          
+          layerDiv.appendChild(sidelineDiv);
+        } else {
+          // 只有主線
+          const mainlineDiv = document.createElement('div');
+          mainlineDiv.className = 'mainline';
+          centerSkills.forEach(skill => {
+            mainlineDiv.appendChild(createSkillNode(skill));
+          });
+          layerDiv.appendChild(mainlineDiv);
+        }
+        
+        skillTreeContainer.appendChild(layerDiv);
+      }
+      
+      console.log('✅ 技能樹已生成');
+    }
+
+    // 🔥 建立技能節點
+    function createSkillNode(skill) {
+      const nodeDiv = document.createElement('div');
+      nodeDiv.className = 'skill-node';
+      nodeDiv.setAttribute('data-id', skill.id);
+      
+      const circleDiv = document.createElement('div');
+      circleDiv.className = `skill-circle ${skill.type === 'side' ? 'side' : ''} locked`;
+      circleDiv.textContent = skill.name;
+      circleDiv.onclick = () => openSkill(skill.id);
+      
+      nodeDiv.appendChild(circleDiv);
+      return nodeDiv;
+    }
+
+
+
+    // 🔥 修正：載入使用者進度
+    window.onload = async function() {
+    console.log('📌 載入課程配置...');
+    console.log('📌 projectId:', projectId);
+    console.log('📌 SCRIPT_URL:', SCRIPT_URL);
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const projectId = urlParams.get('project') || 'appinventor';
+    
+    // 🔥 從後端載入課程配置
+    try {
+      console.log('🔄 發送請求: getCourseConfig, courseId=' + projectId);
+      
+      const configData = await makeRequest({
+        action: 'getCourseConfig',
+        courseId: projectId
+      });
+    
+      console.log('📦 收到課程配置回應:', configData);
+        
+        if (configData.success) {
+          // 載入課程資料
+          currentCourse = configData.data;
+          skills = currentCourse.skills;
+          connections = currentCourse.connections;
+          unlockMap = currentCourse.unlockMap;
+          prerequisites = currentCourse.prerequisites;
+          
+          console.log('✅ 課程配置載入成功:', currentCourse);
+          console.log('   - 技能數量:', Object.keys(skills).length);
+          console.log('   - 連接線數量:', connections.length);
+          
+          // 設定課程標題
+          document.getElementById('treeTitle').textContent = currentCourse.title;
+          
+          // 🔥 動態生成技能樹 HTML
+          generateSkillTree();
+          
+          // 初始化第一個技能為可用
+          const firstSkillNode = document.querySelector('[data-id="1"]');
+          if (firstSkillNode) {
+            const circle = firstSkillNode.querySelector('.skill-circle');
             circle.classList.remove('locked');
             circle.classList.add('available');
           }
+          
+          // 載入使用者進度
+          if (currentUser) {
+            await loadUserProgress();
+            updateHeaderUI();
+          }
+          
+          // 繪製連接線
+          setTimeout(() => drawConnections(), 200);
+          
+          // 顯示技能樹
+          setTimeout(() => {
+            document.querySelector('.skill-tree-section').classList.add('loaded');
+          }, 300);
+          
+          // 移除載入畫面
+          setTimeout(() => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+              loadingOverlay.classList.add('fade-out');
+              setTimeout(() => loadingOverlay.remove(), 500);
+            }
+          }, 500);
+          
+        } else {
+          alert('載入課程失敗：' + configData.message);
+          window.location.href = 'index.html';
         }
+      } catch (err) {
+        console.error('❌ 載入課程配置失敗:', err);
+        alert('載入課程失敗，請重新整理頁面');
       }
-    });
-  }
+    };
 
-  function canUnlock(skillId) {
-    const required = prerequisites[skillId] || [];
-    return required.every(id => completedSkills.has(id));
-  }
-
-  window.onload = async function() {
-    console.log('頁面載入完成');
-    
-    if (currentUser) {
-      updateHeaderUI();
+    // 🔥 載入使用者進度
+    async function loadUserProgress() {
+    try {
+      console.log('🔄 載入使用者進度...');
+      console.log('   userId:', currentUser.userId);
+      console.log('   projectId:', projectId);
       
-      try {
-        const progressData = await makeRequest({
-          action: 'getUserProgress',
-          userId: currentUser.userId,
-          projectId: projectId  // 🔥 加入 projectId
-        });
+      const progressData = await makeRequest({
+        action: 'getUserProgress',
+        userId: currentUser.userId,
+        projectId: projectId
+      });
+    
+    console.log('📦 收到進度回應:', progressData);
         
         if (progressData.success && progressData.data.completedSkills) {
           const completed = progressData.data.completedSkills;
           console.log('✅ 已完成的技能:', completed);
           
+          // 標記已完成
           completed.forEach(skillId => {
             completedSkills.add(skillId);
             const node = document.querySelector(`[data-id="${skillId}"]`);
@@ -1636,220 +1773,202 @@
             }
           });
           
+          // 解鎖下一關
           completed.forEach(skillId => {
             unlockNextSkills(skillId);
           });
-          
-          setTimeout(() => drawConnections(), 200);
         }
       } catch (err) {
         console.error('❌ 載入進度失敗:', err);
       }
     }
-    
-    setTimeout(() => {
-      document.querySelector('.skill-tree-section').classList.add('loaded');
-    }, 200);
-    
-    setTimeout(() => {
-      const loadingOverlay = document.getElementById('loadingOverlay');
-      if (loadingOverlay) {
-        loadingOverlay.classList.add('fade-out');
-        setTimeout(() => loadingOverlay.remove(), 500);
-      }
-    }, 500);
-    
-    setTimeout(() => drawConnections(), 600);
-  };
 
-  function updateHeaderUI() {
-    if (currentUser) {
-      const navRight = document.getElementById('headerNav');
-      if (navRight) {
-        navRight.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="${currentUser.avatar}" alt="avatar" 
-                style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
-            <div style="color: white; text-align: left;">
-              <div style="font-weight: bold; font-size: 14px;">${currentUser.displayName}</div>
-              <div style="font-size: 11px; opacity: 0.85;">完成 ${currentUser.completedCourses || 0} 課程</div>
+    // 更新 Header UI
+    function updateHeaderUI() {
+      if (currentUser) {
+        const navRight = document.getElementById('headerNav');
+        if (navRight) {
+          navRight.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="${currentUser.avatar}" alt="avatar" 
+                  style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
+              <div style="color: white; text-align: left;">
+                <div style="font-weight: bold; font-size: 14px;">${currentUser.displayName}</div>
+                <div style="font-size: 11px; opacity: 0.85;">完成 ${currentUser.completedCourses || 0} 課程</div>
+              </div>
+              <button class="nav-btn" onclick="logout()" 
+                      style="background: rgba(255,255,255,0.1); color: white;">
+                登出
+              </button>
             </div>
-            <button class="nav-btn" onclick="logout()" 
-                    style="background: rgba(255,255,255,0.1); color: white;">
-              登出
-            </button>
-          </div>
-        `;
-      } else {
-        console.error('❌ 找不到 headerNav 元素');
+          `;
+        }
       }
     }
-  }
 
-  function logout() {
-    if (confirm('確定要登出嗎?')) {
-      localStorage.removeItem('currentUser');
-      location.href = 'index.html';
+    function logout() {
+      if (confirm('確定要登出嗎?')) {
+        localStorage.removeItem('currentUser');
+        location.href = 'index.html';
+      }
     }
-  }
 
-  // 🔥 補上缺少的特效函數
-  function showSuccessModal() {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay active';
-    modal.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-icon">🎉</div>
-        <div class="modal-title">太棒了！</div>
-        <div class="modal-message">
-          恭喜完成「${skills[currentSkillId].name}」課程！<br>
-          正確率：100%
+    // 特效函數
+    function showSuccessModal() {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <div class="modal-icon">🎉</div>
+          <div class="modal-title">太棒了！</div>
+          <div class="modal-message">
+            恭喜完成「${skills[currentSkillId].name}」課程！<br>
+            正確率：100%
+          </div>
+          <button class="modal-btn" onclick="closeSuccessModal()">領取獎勵並繼續</button>
         </div>
-        <button class="modal-btn" onclick="closeSuccessModal()">領取獎勵並繼續</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    createFireworks(modal);
-    createStars(modal);
-  }
+      `;
+      document.body.appendChild(modal);
+      createFireworks(modal);
+      createStars(modal);
+    }
 
-  function createFireworks(container) {
-    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3', '#54a0ff'];
-    
-    for (let i = 0; i < 5; i++) {
-      setTimeout(() => {
-        const fireworkContainer = document.createElement('div');
-        fireworkContainer.style.position = 'absolute';
-        fireworkContainer.style.left = Math.random() * 100 + '%';
-        fireworkContainer.style.top = Math.random() * 100 + '%';
-        
-        for (let j = 0; j < 30; j++) {
-          const particle = document.createElement('div');
-          particle.className = 'firework';
-          particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    function createFireworks(container) {
+      const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#ff9ff3', '#54a0ff'];
+      
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const fireworkContainer = document.createElement('div');
+          fireworkContainer.style.position = 'absolute';
+          fireworkContainer.style.left = Math.random() * 100 + '%';
+          fireworkContainer.style.top = Math.random() * 100 + '%';
           
-          const angle = (Math.PI * 2 * j) / 30;
-          const velocity = 50 + Math.random() * 50;
-          particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
-          particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+          for (let j = 0; j < 30; j++) {
+            const particle = document.createElement('div');
+            particle.className = 'firework';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            
+            const angle = (Math.PI * 2 * j) / 30;
+            const velocity = 50 + Math.random() * 50;
+            particle.style.setProperty('--tx', Math.cos(angle) * velocity + 'px');
+            particle.style.setProperty('--ty', Math.sin(angle) * velocity + 'px');
+            
+            fireworkContainer.appendChild(particle);
+          }
           
-          fireworkContainer.appendChild(particle);
-        }
-        
-        container.appendChild(fireworkContainer);
-        setTimeout(() => fireworkContainer.remove(), 1000);
-      }, i * 200);
+          container.appendChild(fireworkContainer);
+          setTimeout(() => fireworkContainer.remove(), 1000);
+        }, i * 200);
+      }
     }
-  }
 
-  function createStars(container) {
-    const stars = ['⭐', '✨', '🌟', '💫'];
-    
-    for (let i = 0; i < 20; i++) {
-      setTimeout(() => {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.textContent = stars[Math.floor(Math.random() * stars.length)];
-        star.style.left = Math.random() * 100 + '%';
-        star.style.animationDelay = Math.random() * 2 + 's';
-        star.style.animationDuration = (2 + Math.random() * 2) + 's';
-        
-        container.appendChild(star);
-        setTimeout(() => star.remove(), 4000);
-      }, i * 100);
+    function createStars(container) {
+      const stars = ['⭐', '✨', '🌟', '💫'];
+      
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          const star = document.createElement('div');
+          star.className = 'star';
+          star.textContent = stars[Math.floor(Math.random() * stars.length)];
+          star.style.left = Math.random() * 100 + '%';
+          star.style.animationDelay = Math.random() * 2 + 's';
+          star.style.animationDuration = (2 + Math.random() * 2) + 's';
+          
+          container.appendChild(star);
+          setTimeout(() => star.remove(), 4000);
+        }, i * 100);
+      }
     }
-  }
 
-  function closeSuccessModal() {
-    const modal = document.querySelector('.modal-overlay');
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
+    function closeSuccessModal() {
+      const modal = document.querySelector('.modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+      }
+      completeSkill();
     }
-    completeSkill();
-  }
 
-  function showFailModal(percentage) {
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay active';
-    modal.innerHTML = `
-      <div class="modal-content fail">
-        <div class="modal-icon">😢</div>
-        <div class="modal-title">再接再厲！</div>
-        <div class="modal-message">
-          「${skills[currentSkillId].name}」課程<br>
-          正確率：${percentage}%<br>
-          需要達到 100% 才能通過喔！
+    function showFailModal(percentage) {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal-content fail">
+          <div class="modal-icon">😢</div>
+          <div class="modal-title">再接再厲！</div>
+          <div class="modal-message">
+            「${skills[currentSkillId].name}」課程<br>
+            正確率：${percentage}%<br>
+            需要達到 100% 才能通過喔！
+          </div>
+          <button class="modal-btn" onclick="closeFailModal()">重新挑戰</button>
         </div>
-        <button class="modal-btn" onclick="closeFailModal()">重新挑戰</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    createRaindrops(modal);
-    createFragments(modal);
-  }
-
-  function createRaindrops(container) {
-    for (let i = 0; i < 30; i++) {
-      setTimeout(() => {
-        const raindrop = document.createElement('div');
-        raindrop.className = 'raindrop';
-        raindrop.style.left = Math.random() * 100 + '%';
-        raindrop.style.animationDelay = Math.random() * 1 + 's';
-        raindrop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
-        
-        container.appendChild(raindrop);
-        setTimeout(() => raindrop.remove(), 2000);
-      }, i * 50);
+      `;
+      document.body.appendChild(modal);
+      createRaindrops(modal);
+      createFragments(modal);
     }
-  }
 
-  function createFragments(container) {
-    for (let i = 0; i < 20; i++) {
-      setTimeout(() => {
-        const fragment = document.createElement('div');
-        fragment.className = 'fragment';
-        fragment.style.left = '50%';
-        fragment.style.top = '50%';
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const distance = 100 + Math.random() * 100;
-        fragment.style.setProperty('--fx', Math.cos(angle) * distance + 'px');
-        fragment.style.setProperty('--fy', Math.sin(angle) * distance + 'px');
-        fragment.style.setProperty('--fr', Math.random() * 360 + 'deg');
-        
-        container.appendChild(fragment);
-        setTimeout(() => fragment.remove(), 2000);
-      }, i * 30);
+    function createRaindrops(container) {
+      for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+          const raindrop = document.createElement('div');
+          raindrop.className = 'raindrop';
+          raindrop.style.left = Math.random() * 100 + '%';
+          raindrop.style.animationDelay = Math.random() * 1 + 's';
+          raindrop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+          
+          container.appendChild(raindrop);
+          setTimeout(() => raindrop.remove(), 2000);
+        }, i * 50);
+      }
     }
-  }
 
-  function closeFailModal() {
-    const modal = document.querySelector('.modal-overlay');
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
+    function createFragments(container) {
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          const fragment = document.createElement('div');
+          fragment.className = 'fragment';
+          fragment.style.left = '50%';
+          fragment.style.top = '50%';
+          
+          const angle = (Math.PI * 2 * i) / 20;
+          const distance = 100 + Math.random() * 100;
+          fragment.style.setProperty('--fx', Math.cos(angle) * distance + 'px');
+          fragment.style.setProperty('--fy', Math.sin(angle) * distance + 'px');
+          fragment.style.setProperty('--fr', Math.random() * 360 + 'deg');
+          
+          container.appendChild(fragment);
+          setTimeout(() => fragment.remove(), 2000);
+        }, i * 30);
+      }
     }
-    retryQuiz();
-  }
 
-  function retryQuiz() {
-    stopYouTubeVideo();
-    
-    const id = currentSkillId;
-    currentSkillId = null;
-    userAnswers = [];
-    videoWatched = false;
-    
-    document.getElementById('quizStage').style.display = 'none';
-    document.getElementById('videoStage').style.display = 'block';
-    document.getElementById('resultMessage').innerHTML = '';
-    document.getElementById('contentSection').scrollTop = 0;
-    
-    currentSkillId = id;
-    loadYouTubeVideo(id);
-  }
+    function closeFailModal() {
+      const modal = document.querySelector('.modal-overlay');
+      if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+      }
+      retryQuiz();
+    }
 
-    </script>
+    function retryQuiz() {
+      stopYouTubeVideo();
+      
+      const id = currentSkillId;
+      currentSkillId = null;
+      userAnswers = [];
+      videoWatched = false;
+      
+      document.getElementById('quizStage').style.display = 'none';
+      document.getElementById('videoStage').style.display = 'block';
+      document.getElementById('resultMessage').innerHTML = '';
+      document.getElementById('contentSection').scrollTop = 0;
+      
+      currentSkillId = id;
+      loadYouTubeVideo(id);
+    }
+  </script>
 </body>
 </html>
