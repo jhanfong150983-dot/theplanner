@@ -1064,7 +1064,7 @@
     // 🔥 主要修正：API 和資料結構對應
     // ============================================
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby292a8Rs_CUyxqoWlcE_-Slfg4Sn0LqjMhirb02voYO037wBvZI4KzN8lAJp6LlTdP/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_zq5ApaEk6Yji0ZaVKUG7JmqeJxeWnYw3Dj1zgo2iAG6epsBKvSEDVweKgwoHouqf/exec';
 
     // YouTube 播放器相關
     let youtubePlayer = null;
@@ -1972,28 +1972,67 @@ function drawConnections() {
   }
 };
 
-    // 更新 Header UI
-    function updateHeaderUI() {
-      if (currentUser) {
-        const navRight = document.getElementById('headerNav');
-        if (navRight) {
-          navRight.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <img src="${currentUser.avatar}" alt="avatar" 
-                  style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
-              <div style="color: white; text-align: left;">
-                <div style="font-weight: bold; font-size: 14px;">${currentUser.displayName}</div>
-                <div style="font-size: 11px; opacity: 0.85;">完成 ${currentUser.completedCourses || 0} 課程</div>
+    // 更新 Header UI（完整替換）
+  function updateHeaderUI() {
+    if (currentUser) {
+      const navRight = document.getElementById('headerNav');
+      if (navRight) {
+        navRight.innerHTML = `
+          <div class="user-menu" id="userMenu">
+            <div class="user-display" onclick="toggleUserMenu()">
+              <img src="${currentUser.avatar}" alt="avatar" class="user-avatar">
+              <div class="user-info">
+                <span class="user-name">${currentUser.displayName}</span>
+                <span class="user-stats">完成 ${currentUser.completedCourses || 0} 課程</span>
               </div>
-              <button class="nav-btn" onclick="logout()" 
-                      style="background: rgba(255,255,255,0.1); color: white;">
-                登出
-              </button>
+              <span class="dropdown-arrow">▼</span>
             </div>
-          `;
-        }
+            
+            <div class="dropdown-menu">
+              <a href="dashboard.html" class="dropdown-item">
+                <span class="dropdown-icon">📊</span>
+                <div class="dropdown-text">
+                  <span class="dropdown-label">學習分析</span>
+                  <span class="dropdown-desc">查看學習進度與統計</span>
+                </div>
+              </a>
+              
+              <a href="achievements.html" class="dropdown-item">
+                <span class="dropdown-icon">🏆</span>
+                <div class="dropdown-text">
+                  <span class="dropdown-label">成就系統</span>
+                  <span class="dropdown-desc">查看獲得的成就與徽章</span>
+                </div>
+              </a>
+              
+              <div class="dropdown-divider"></div>
+              
+              <div class="dropdown-item logout" onclick="logout()">
+                <span class="dropdown-icon">🚪</span>
+                <div class="dropdown-text">
+                  <span class="dropdown-label">登出</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
       }
     }
+  }
+
+  // 切換選單
+  function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    if (menu) menu.classList.toggle('open');
+  }
+
+  // 點擊外部關閉
+  document.addEventListener('click', function(event) {
+    const menu = document.getElementById('userMenu');
+    if (menu && !menu.contains(event.target)) {
+      menu.classList.remove('open');
+    }
+  });
 
     function logout() {
       if (confirm('確定要登出嗎?')) {

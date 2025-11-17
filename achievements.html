@@ -298,9 +298,158 @@
         grid-template-columns: repeat(2, 1fr);
       }
     }
+
+    /* 使用者下拉選單 */
+    .user-menu {
+    position: relative;
+    display: inline-block;
+    }
+
+    .user-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-display:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    }
+
+    .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    }
+
+    .user-info {
+    color: white;
+    text-align: left;
+    }
+
+    .user-name {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    }
+
+    .user-stats {
+    font-size: 11px;
+    opacity: 0.85;
+    display: block;
+    }
+
+    .dropdown-arrow {
+    font-size: 12px;
+    color: white;
+    transition: transform 0.3s;
+    }
+
+    .user-menu.open .dropdown-arrow {
+    transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    }
+
+    .user-menu.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    }
+
+    .dropdown-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    }
+
+    .dropdown-item:last-child {
+    border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+    background: #f8f9fa;
+    }
+
+    .dropdown-icon {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    }
+
+    .dropdown-text {
+    flex: 1;
+    }
+
+    .dropdown-label {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+    color: #2d3748;
+    }
+
+    .dropdown-desc {
+    font-size: 11px;
+    color: #718096;
+    margin-top: 2px;
+    }
+
+    .dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+    }
+
+    .dropdown-item.logout {
+    color: #e53e3e;
+    }
+
+    .dropdown-item.logout:hover {
+    background: #fff5f5;
+    }
   </style>
 </head>
 <body>
+
+    <!-- Header -->
+    <header style="background: #4a6cf7; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <nav style="display: flex; gap: 8px; align-items: center;">
+        <a href="index.html" style="display: flex; align-items: center; margin-right: 12px; text-decoration: none;">
+            <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto;" onerror="this.style.display='none'">
+        </a>
+        </nav>
+        <div id="headerNav" style="display: flex; gap: 8px; align-items: center;">
+        <!-- 動態載入 -->
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 88px;"></div>
+
   <div class="container">
     <!-- 返回按鈕 -->
     <button class="back-btn" onclick="location.href='index.html'">← 返回首頁</button>
@@ -541,6 +690,7 @@
       }
 
       currentUser = JSON.parse(userData);
+      updateHeaderUI();
       document.getElementById('userGreeting').textContent = 
         `${currentUser.displayName} 的成就收藏`;
 
@@ -665,6 +815,74 @@
 
     // 頁面載入
     window.onload = loadAchievements;
+
+    // 更新 Header UI
+    function updateHeaderUI() {
+    if (!currentUser) return;
+    
+    const navRight = document.getElementById('headerNav');
+    navRight.innerHTML = `
+        <div class="user-menu" id="userMenu">
+        <div class="user-display" onclick="toggleUserMenu()">
+            <img src="${currentUser.avatar}" alt="avatar" class="user-avatar">
+            <div class="user-info">
+            <span class="user-name">${currentUser.displayName}</span>
+            <span class="user-stats">完成 ${currentUser.completedCourses || 0} 課程</span>
+            </div>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        
+        <div class="dropdown-menu">
+            <a href="dashboard.html" class="dropdown-item">
+            <span class="dropdown-icon">📊</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">學習分析</span>
+                <span class="dropdown-desc">查看學習進度與統計</span>
+            </div>
+            </a>
+            
+            <a href="achievements.html" class="dropdown-item">
+            <span class="dropdown-icon">🏆</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">成就系統</span>
+                <span class="dropdown-desc">查看獲得的成就與徽章</span>
+            </div>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <div class="dropdown-item logout" onclick="logout()">
+            <span class="dropdown-icon">🚪</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">登出</span>
+            </div>
+            </div>
+        </div>
+        </div>
+    `;
+    }
+
+    // 切換選單
+    function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('open');
+    }
+
+    // 點擊外部關閉
+    document.addEventListener('click', function(event) {
+    const menu = document.getElementById('userMenu');
+    if (menu && !menu.contains(event.target)) {
+        menu.classList.remove('open');
+    }
+    });
+
+    // 登出
+    function logout() {
+    if (confirm('確定要登出嗎?')) {
+        localStorage.removeItem('currentUser');
+        location.href = 'index.html';
+    }
+    }
   </script>
 </body>
 </html>

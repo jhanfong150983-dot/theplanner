@@ -394,9 +394,225 @@
       .hero-title { font-size: 24px; }
       .strength-grid { grid-template-columns: 1fr; }
     }
+
+    /* 載入遮罩 */
+    .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+    }
+
+    .loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    }
+
+    .loading-spinner {
+    width: 80px;
+    height: 80px;
+    border: 8px solid rgba(255, 255, 255, 0.2);
+    border-top: 8px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+    margin-top: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    animation: pulse-text 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+    }
+
+    .loading-logo {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 30px;
+    animation: float-logo 2s ease-in-out infinite;
+    }
+
+    @keyframes float-logo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+    }
+
+    /* 使用者下拉選單 */
+    .user-menu {
+    position: relative;
+    display: inline-block;
+    }
+
+    .user-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-display:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    }
+
+    .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    }
+
+    .user-info {
+    color: white;
+    text-align: left;
+    }
+
+    .user-name {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    }
+
+    .user-stats {
+    font-size: 11px;
+    opacity: 0.85;
+    display: block;
+    }
+
+    .dropdown-arrow {
+    font-size: 12px;
+    color: white;
+    transition: transform 0.3s;
+    }
+
+    .user-menu.open .dropdown-arrow {
+    transform: rotate(180deg);
+    }
+
+    .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    }
+
+    .user-menu.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    }
+
+    .dropdown-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    }
+
+    .dropdown-item:last-child {
+    border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+    background: #f8f9fa;
+    }
+
+    .dropdown-icon {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    }
+
+    .dropdown-text {
+    flex: 1;
+    }
+
+    .dropdown-label {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+    color: #2d3748;
+    }
+
+    .dropdown-desc {
+    font-size: 11px;
+    color: #718096;
+    margin-top: 2px;
+    }
+
+    .dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+    }
+
+    .dropdown-item.logout {
+    color: #e53e3e;
+    }
+
+    .dropdown-item.logout:hover {
+    background: #fff5f5;
+    }
   </style>
 </head>
 <body>
+    <!-- 載入遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+    <img src="assets/logo.png" alt="Logo" class="loading-logo" 
+        onerror="this.style.display='none'">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">載入學習分析中...</div>
+    </div>
+
+    <!-- Header -->
+    <header style="background: #4a6cf7; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <nav style="display: flex; gap: 8px; align-items: center;">
+        <a href="index.html" style="display: flex; align-items: center; margin-right: 12px; text-decoration: none;">
+            <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto;" onerror="this.style.display='none'">
+        </a>
+        </nav>
+        <div id="headerNav" style="display: flex; gap: 8px; align-items: center;">
+        <!-- 動態載入 -->
+        </div>
+    </header>
+
+    <div class="container" style="padding-top: 88px;"></div>
+
   <div class="container">
     <!-- 返回按鈕 -->
     <button class="back-btn" onclick="location.href='index.html'">← 返回首頁</button>
@@ -520,7 +736,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby292a8Rs_CUyxqoWlcE_-Slfg4Sn0LqjMhirb02voYO037wBvZI4KzN8lAJp6LlTdP/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_zq5ApaEk6Yji0ZaVKUG7JmqeJxeWnYw3Dj1zgo2iAG6epsBKvSEDVweKgwoHouqf/exec';
     
     let currentUser = null;
     let detailVisible = false;
@@ -554,6 +770,7 @@
       }
 
       currentUser = JSON.parse(userData);
+      updateHeaderUI();
       document.getElementById('userName').textContent = `${currentUser.displayName} 的學習成果`;
 
       try {
@@ -587,36 +804,103 @@
         // 生成建議
         generateSuggestion(stats.data);
 
-      } catch (err) {
-        console.error('載入失敗:', err);
-      }
+        // 載入詳細數據
+        await loadDetailedData();
+
+        } catch (err) {
+            console.error('載入失敗:', err);
+        } finally {
+            // 🔥 移除載入畫面
+            setTimeout(() => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('fade-out');
+                setTimeout(() => loadingOverlay.remove(), 500);
+            }
+            }, 500);
+        }
     }
 
-    // 顯示技能徽章
-    function displaySkillBadges(completed) {
-      const badges = document.getElementById('skillBadges');
-      const skills = ['基礎介紹', '介面設計', '程式邏輯', '遊戲製作', '專題發表'];
-      
-      badges.innerHTML = skills.map((skill, i) => {
-        const isCompleted = completed.includes(i + 1);
+    // 顯示技能徽章（動態從課程配置讀取）
+    async function displaySkillBadges(completedSkillIds) {
+    const badges = document.getElementById('skillBadges');
+    badges.innerHTML = '<div class="skill-badge skill-completed">✓ 載入中...</div>';
+    
+    try {
+        // 🔥 從後端讀取課程配置
+        const configData = await makeRequest({
+        action: 'getCourseConfig',
+        courseId: 'appinventor'
+        });
+        
+        if (!configData.success) {
+        badges.innerHTML = '<div class="skill-badge skill-locked">載入失敗</div>';
+        return;
+        }
+        
+        const skills = configData.data.skills;
+        
+        // 🔥 按技能ID排序
+        const sortedSkills = Object.values(skills).sort((a, b) => a.id - b.id);
+        
+        // 🔥 只顯示前8個技能（避免太長）
+        const displaySkills = sortedSkills.slice(0, 8);
+        
+        badges.innerHTML = displaySkills.map(skill => {
+        const isCompleted = completedSkillIds.includes(skill.id);
         const className = isCompleted ? 'skill-completed' : 'skill-locked';
         const icon = isCompleted ? '✓' : '🔒';
-        return `<div class="skill-badge ${className}">${icon} ${skill}</div>`;
-      }).join('');
+        return `<div class="skill-badge ${className}">${icon} ${skill.name}</div>`;
+        }).join('');
+        
+        // 🔥 如果還有更多技能，顯示提示
+        if (sortedSkills.length > 8) {
+        badges.innerHTML += `<div class="skill-badge skill-progress">... 還有 ${sortedSkills.length - 8} 個技能</div>`;
+        }
+        
+    } catch (err) {
+        console.error('載入技能失敗:', err);
+        badges.innerHTML = '<div class="skill-badge skill-locked">載入失敗</div>';
+    }
     }
 
-    // 生成建議
+    // 生成建議（預設規則）
     function generateSuggestion(stats) {
-      const suggestions = document.getElementById('suggestionContent');
-      const completed = stats.completedCourses || 0;
-
-      if (completed === 0) {
-        suggestions.textContent = '歡迎開始你的第一個技能！建議從「基礎介紹」開始，這會幫助你快速上手。';
-      } else if (completed < 5) {
-        suggestions.textContent = `你已經完成 ${completed} 個技能了！繼續保持這個節奏，很快就能解鎖更多有趣的內容。`;
-      } else {
-        suggestions.textContent = '你已經是高手了！準備挑戰最後的專題發表，展示你的學習成果吧！';
-      }
+    const suggestions = document.getElementById('suggestionContent');
+    const completed = stats.completedCourses || 0;
+    
+    // 🔥 多種建議模板
+    const templates = {
+        beginner: [
+        '歡迎開始你的第一個技能！建議從「基礎介紹」開始，這會幫助你快速上手。',
+        '剛開始學習是最興奮的時刻！建議先完成基礎課程，打好基礎。',
+        '新手上路！先從簡單的課程開始，慢慢建立信心吧！'
+        ],
+        intermediate: [
+        `你已經完成 ${completed} 個技能了！繼續保持這個節奏，很快就能解鎖更多有趣的內容。`,
+        `進步神速！${completed} 個技能已經完成，建議挑戰更進階的內容。`,
+        `做得很好！已經完成 ${completed} 個技能，距離目標越來越近了！`
+        ],
+        advanced: [
+        '你已經是高手了！準備挑戰最後的專題發表，展示你的學習成果吧！',
+        '太厲害了！大部分技能都已完成，現在可以開始做專題了！',
+        '恭喜你即將完成所有課程！最後一哩路，加油！'
+        ]
+    };
+    
+    // 🔥 根據進度選擇建議
+    let category, index;
+    if (completed === 0) {
+        category = 'beginner';
+    } else if (completed < 10) {
+        category = 'intermediate';
+    } else {
+        category = 'advanced';
+    }
+    
+    // 🔥 隨機選擇一個建議（增加變化性）
+    index = Math.floor(Math.random() * templates[category].length);
+    suggestions.textContent = templates[category][index];
     }
 
     // 切換詳細數據
@@ -627,8 +911,162 @@
         detailVisible ? '📊 隱藏詳細數據' : '📊 查看詳細學習數據';
     }
 
+    // 載入詳細數據
+    async function loadDetailedData() {
+    try {
+        // 🔥 載入影片記錄
+        const videoData = await makeRequest({
+        action: 'getVideoRecords',
+        userId: currentUser.userId
+        });
+        
+        displayVideoDetails(videoData);
+        
+        // 🔥 載入測驗記錄
+        const quizData = await makeRequest({
+        action: 'getQuizRecords',
+        userId: currentUser.userId
+        });
+        
+        displayQuizDetails(quizData);
+        
+    } catch (err) {
+        console.error('載入詳細數據失敗:', err);
+    }
+    }
+
+    // 顯示影片記錄
+    function displayVideoDetails(data) {
+    const container = document.getElementById('videoDetails');
+    
+    if (!data || !data.success || !data.records || data.records.length === 0) {
+        container.innerHTML = `
+        <div style="text-align: center; padding: 30px; color: #999;">
+            <div style="font-size: 48px; margin-bottom: 10px;">📹</div>
+            <div>還沒有觀看記錄</div>
+        </div>
+        `;
+        return;
+    }
+    
+    // 🔥 顯示最近5筆記錄
+    const recentRecords = data.records.slice(0, 5);
+    
+    container.innerHTML = recentRecords.map(record => `
+        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-weight: bold; color: #2d3748;">${record.skillName || '未知課程'}</span>
+            <span style="color: #10b981; font-weight: bold;">${record.completionRate || 100}%</span>
+        </div>
+        <div style="font-size: 12px; color: #718096;">
+            觀看時間：${record.watchDate || '未知'}
+        </div>
+        </div>
+    `).join('');
+    }
+
+    // 顯示測驗記錄
+    function displayQuizDetails(data) {
+    const container = document.getElementById('quizDetails');
+    
+    if (!data || !data.success || !data.records || data.records.length === 0) {
+        container.innerHTML = `
+        <div style="text-align: center; padding: 30px; color: #999;">
+            <div style="font-size: 48px; margin-bottom: 10px;">📝</div>
+            <div>還沒有測驗記錄</div>
+        </div>
+        `;
+        return;
+    }
+    
+    // 🔥 顯示最近5筆記錄
+    const recentRecords = data.records.slice(0, 5);
+    
+    container.innerHTML = recentRecords.map(record => `
+        <div style="padding: 15px; background: #f9fafb; border-radius: 8px; margin-bottom: 10px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <span style="font-weight: bold; color: #2d3748;">${record.skillName || '未知測驗'}</span>
+            <span style="color: ${record.score >= 80 ? '#10b981' : '#f59e0b'}; font-weight: bold;">
+            ${record.score || 0} 分
+            </span>
+        </div>
+        <div style="font-size: 12px; color: #718096;">
+            測驗時間：${record.quizDate || '未知'} | 嘗試次數：${record.attemptNumber || 1}
+        </div>
+        </div>
+    `).join('');
+    }
+
     // 頁面載入
     window.onload = loadDashboard;
+
+    // 更新 Header UI
+    function updateHeaderUI() {
+    if (!currentUser) return;
+    
+    const navRight = document.getElementById('headerNav');
+    navRight.innerHTML = `
+        <div class="user-menu" id="userMenu">
+        <div class="user-display" onclick="toggleUserMenu()">
+            <img src="${currentUser.avatar}" alt="avatar" class="user-avatar">
+            <div class="user-info">
+            <span class="user-name">${currentUser.displayName}</span>
+            <span class="user-stats">完成 ${currentUser.completedCourses || 0} 課程</span>
+            </div>
+            <span class="dropdown-arrow">▼</span>
+        </div>
+        
+        <div class="dropdown-menu">
+            <a href="dashboard.html" class="dropdown-item">
+            <span class="dropdown-icon">📊</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">學習分析</span>
+                <span class="dropdown-desc">查看學習進度與統計</span>
+            </div>
+            </a>
+            
+            <a href="achievements.html" class="dropdown-item">
+            <span class="dropdown-icon">🏆</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">成就系統</span>
+                <span class="dropdown-desc">查看獲得的成就與徽章</span>
+            </div>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <div class="dropdown-item logout" onclick="logout()">
+            <span class="dropdown-icon">🚪</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">登出</span>
+            </div>
+            </div>
+        </div>
+        </div>
+    `;
+    }
+
+    // 切換選單
+    function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('open');
+    }
+
+    // 點擊外部關閉
+    document.addEventListener('click', function(event) {
+    const menu = document.getElementById('userMenu');
+    if (menu && !menu.contains(event.target)) {
+        menu.classList.remove('open');
+    }
+    });
+
+    // 登出
+    function logout() {
+    if (confirm('確定要登出嗎?')) {
+        localStorage.removeItem('currentUser');
+        location.href = 'index.html';
+    }
+    }
   </script>
 </body>
 </html>
