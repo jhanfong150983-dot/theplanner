@@ -973,7 +973,6 @@
     </nav>
 
     <div class="nav-right" id="headerNav">
-      <button class="auth-btn register-btn">註冊</button>
       <button class="auth-btn login-btn">登入</button>
     </div>
   </header>
@@ -989,6 +988,7 @@
       <div class="skill-tree" id="skillTree">
       <!-- 🔥 技能樹將由 JavaScript 動態生成 -->
       </div>
+    </div>
 
     <!-- 右側：內容區域 -->
     <div class="content-section" id="contentSection">
@@ -1665,7 +1665,7 @@
 
 
     // 🔥 修正：載入使用者進度
-window.onload = async function() {
+  window.onload = async function() {
   console.log('📌 載入課程配置...');
   
   // 從 URL 取得專案 ID
