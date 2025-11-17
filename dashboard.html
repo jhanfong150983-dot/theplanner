@@ -736,28 +736,59 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxaQMp3WhADo8ZkZXLN07dqtgowGe4spGJMBiAHLMJGU8Ntb4zfGrhcNSjECUUonj0v/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwq27MHeS9zcw_JzZTmN5uL7knZ84W0nNvtPDLWEvxNiEav2BbJK0Wz-NHVxBNXjR2Z/exec';
     
     let currentUser = null;
     let detailVisible = false;
 
     // JSONP 請求
     function makeRequest(data) {
-      return new Promise((resolve, reject) => {
-        const callbackName = 'jsonp_' + Date.now();
+    return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+        
+        // 🔥 先定義全域回調函數
         window[callbackName] = function(response) {
-          delete window[callbackName];
-          resolve(response);
+        console.log('📥 API 回應:', response);
+        delete window[callbackName];
+        if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+        resolve(response);
         };
-        const params = new URLSearchParams({ callback: callbackName, ...data });
+        
+        const params = new URLSearchParams({ 
+        callback: callbackName, 
+        ...data 
+        });
+        
         const script = document.createElement('script');
         script.src = `${SCRIPT_URL}?${params}`;
-        script.onerror = () => reject(new Error('請求失敗'));
-        document.body.appendChild(script);
+        
+        // 🔥 錯誤處理
+        script.onerror = () => {
+        console.error('❌ JSONP 載入失敗');
+        delete window[callbackName];
+        if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+        }
+        reject(new Error('請求失敗'));
+        };
+        
+        // 🔥 超時處理
         setTimeout(() => {
-          if (window[callbackName]) reject(new Error('請求超時'));
+        if (window[callbackName]) {
+            console.error('⏱️ JSONP 請求超時');
+            delete window[callbackName];
+            if (script && script.parentNode) {
+            script.parentNode.removeChild(script);
+            }
+            reject(new Error('請求超時'));
+        }
         }, 15000);
-      });
+        
+        // 🔥 最後才加入 script（確保回調函數已定義）
+        document.body.appendChild(script);
+    });
     }
 
     // 載入數據
