@@ -505,384 +505,238 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby292a8Rs_CUyxqoWlcE_-Slfg4Sn0LqjMhirb02voYO037wBvZI4KzN8lAJp6LlTdP/exec';
-    
-    let currentUser = null;
-    let allAchievements = [];
-    let currentCategory = 'all';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/你的網址/exec';
+  
+  let currentUser = null;
+  let allAchievements = [];
+  let currentCategory = 'all';
 
-    // 成就定義
-    const ACHIEVEMENTS = [
-      // 學習成就
-      {
-        id: 'first_skill',
-        category: 'learning',
-        icon: '🎯',
-        title: '初心者',
-        desc: '完成第一個技能',
-        rarity: 'common',
-        points: 10,
-        condition: (stats) => stats.completedCourses >= 1
-      },
-      {
-        id: 'five_skills',
-        category: 'learning',
-        icon: '📚',
-        title: '勤奮學習者',
-        desc: '完成 5 個技能',
-        rarity: 'common',
-        points: 50,
-        condition: (stats) => stats.completedCourses >= 5
-      },
-      {
-        id: 'ten_skills',
-        category: 'learning',
-        icon: '🌟',
-        title: '技能大師',
-        desc: '完成 10 個技能',
-        rarity: 'rare',
-        points: 100,
-        condition: (stats) => stats.completedCourses >= 10
-      },
-      {
-        id: 'all_skills',
-        category: 'learning',
-        icon: '👑',
-        title: '全能學習者',
-        desc: '完成所有技能',
-        rarity: 'legendary',
-        points: 500,
-        condition: (stats) => stats.completedCourses >= 20
-      },
-      
-      // 連續學習
-      {
-        id: 'streak_3',
-        category: 'streak',
-        icon: '🔥',
-        title: '堅持不懈',
-        desc: '連續學習 3 天',
-        rarity: 'common',
-        points: 30,
-        condition: (stats) => stats.streakDays >= 3
-      },
-      {
-        id: 'streak_7',
-        category: 'streak',
-        icon: '🔥',
-        title: '每週常客',
-        desc: '連續學習 7 天',
-        rarity: 'rare',
-        points: 70,
-        condition: (stats) => stats.streakDays >= 7
-      },
-      {
-        id: 'streak_30',
-        category: 'streak',
-        icon: '🔥',
-        title: '月度冠軍',
-        desc: '連續學習 30 天',
-        rarity: 'legendary',
-        points: 300,
-        condition: (stats) => stats.streakDays >= 30
-      },
-      
-      // 測驗大師
-      {
-        id: 'quiz_perfect',
-        category: 'quiz',
-        icon: '💯',
-        title: '完美主義者',
-        desc: '10 次測驗都獲得滿分',
-        rarity: 'rare',
-        points: 100,
-        condition: (stats) => stats.perfectQuizzes >= 10
-      },
-      {
-        id: 'quiz_first_try',
-        category: 'quiz',
-        icon: '⚡',
-        title: '一擊必殺',
-        desc: '連續 5 次測驗都一次通過',
-        rarity: 'rare',
-        points: 80,
-        condition: (stats) => stats.firstTryStreak >= 5
-      },
-      
-      // 技能精通
-      {
-        id: 'main_master',
-        category: 'skill',
-        icon: '🌳',
-        title: '主線完成者',
-        desc: '完成所有主線技能',
-        rarity: 'rare',
-        points: 150,
-        condition: (stats) => stats.mainSkillsCompleted >= 5
-      },
-      {
-        id: 'side_master',
-        category: 'skill',
-        icon: '🌿',
-        title: '支線探索者',
-        desc: '完成所有支線技能',
-        rarity: 'rare',
-        points: 150,
-        condition: (stats) => stats.sideSkillsCompleted >= 5
-      },
-      
-      // 特殊成就
-      {
-        id: 'fast_learner',
-        category: 'special',
-        icon: '⚡',
-        title: '閃電學習',
-        desc: '單日完成 3 個技能',
-        rarity: 'legendary',
-        points: 200,
-        condition: (stats) => stats.skillsInOneDay >= 3
-      },
-      {
-        id: 'night_owl',
-        category: 'special',
-        icon: '🦉',
-        title: '夜貓子',
-        desc: '在晚上 23:00 後完成學習',
-        rarity: 'rare',
-        points: 50,
-        condition: (stats) => stats.lateNightLearning >= 1
-      },
-      {
-        id: 'early_bird',
-        category: 'special',
-        icon: '🐦',
-        title: '早起鳥兒',
-        desc: '在早上 6:00 前開始學習',
-        rarity: 'rare',
-        points: 50,
-        condition: (stats) => stats.earlyMorningLearning >= 1
-      }
-    ];
+  // JSONP 請求
+  function makeRequest(data) {
+    return new Promise((resolve, reject) => {
+      const callbackName = 'jsonp_' + Date.now();
+      window[callbackName] = function(response) {
+        delete window[callbackName];
+        resolve(response);
+      };
+      const params = new URLSearchParams({ callback: callbackName, ...data });
+      const script = document.createElement('script');
+      script.src = `${SCRIPT_URL}?${params}`;
+      script.onerror = () => reject(new Error('請求失敗'));
+      document.body.appendChild(script);
+    });
+  }
 
-    // JSONP 請求
-    function makeRequest(data) {
-      return new Promise((resolve, reject) => {
-        const callbackName = 'jsonp_' + Date.now();
-        window[callbackName] = function(response) {
-          delete window[callbackName];
-          resolve(response);
-        };
-        const params = new URLSearchParams({ callback: callbackName, ...data });
-        const script = document.createElement('script');
-        script.src = `${SCRIPT_URL}?${params}`;
-        script.onerror = () => reject(new Error('請求失敗'));
-        document.body.appendChild(script);
-      });
+  // 載入成就
+  async function loadAchievements() {
+    const userData = localStorage.getItem('currentUser');
+    if (!userData) {
+      alert('請先登入');
+      location.href = 'login.html';
+      return;
     }
 
-    // 載入成就
-    async function loadAchievements() {
-      const userData = localStorage.getItem('currentUser');
-      if (!userData) {
-        alert('請先登入');
-        location.href = 'login.html';
+    currentUser = JSON.parse(userData);
+    document.getElementById('userGreeting').textContent = 
+      `${currentUser.displayName} 的成就收藏`;
+
+    // 🔥 更新 Header
+    updateHeaderUI();
+
+    try {
+      // 1. 🔥 從資料庫載入成就定義
+      const achievementsResult = await makeRequest({
+        action: 'getAchievements'
+      });
+
+      if (!achievementsResult.success) {
+        alert('載入成就失敗：' + achievementsResult.message);
         return;
       }
 
-      currentUser = JSON.parse(userData);
-      updateHeaderUI();
-      document.getElementById('userGreeting').textContent = 
-        `${currentUser.displayName} 的成就收藏`;
-
-      try {
-        // 載入使用者統計
-        const stats = await makeRequest({
-          action: 'getUserStats',
-          userId: currentUser.userId
-        });
-
-        // 模擬額外統計（未來從資料庫讀取）
-        const userStats = {
-          completedCourses: stats.data?.completedCourses || 0,
-          streakDays: 7, // 示例
-          perfectQuizzes: 5, // 示例
-          firstTryStreak: 3, // 示例
-          mainSkillsCompleted: 2,
-          sideSkillsCompleted: 1,
-          skillsInOneDay: 1,
-          lateNightLearning: 0,
-          earlyMorningLearning: 0
-        };
-
-        // 評估所有成就
-        allAchievements = ACHIEVEMENTS.map(achievement => {
-          const unlocked = achievement.condition(userStats);
-          return {
-            ...achievement,
-            unlocked,
-            unlockedDate: unlocked ? new Date().toLocaleDateString('zh-TW') : null
-          };
-        });
-
-        // 更新統計
-        updateStats();
-        
-        // 顯示成就
-        displayAchievements();
-
-      } catch (err) {
-        console.error('載入失敗:', err);
-      }
-    }
-
-    // 更新統計
-    function updateStats() {
-      const unlocked = allAchievements.filter(a => a.unlocked);
-      const totalPoints = unlocked.reduce((sum, a) => sum + a.points, 0);
-      const rareCount = unlocked.filter(a => a.rarity === 'rare' || a.rarity === 'legendary').length;
-      
-      document.getElementById('totalAchievements').textContent = unlocked.length;
-      document.getElementById('completionRate').textContent = 
-        Math.round((unlocked.length / ACHIEVEMENTS.length) * 100) + '%';
-      document.getElementById('totalPoints').textContent = totalPoints;
-      document.getElementById('rareCount').textContent = rareCount;
-    }
-
-    // 顯示成就
-    function displayAchievements() {
-      const grid = document.getElementById('achievementsGrid');
-      
-      const filtered = currentCategory === 'all' 
-        ? allAchievements 
-        : allAchievements.filter(a => a.category === currentCategory);
-      
-      if (filtered.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1;">
-            <div class="empty-icon">🔍</div>
-            <div class="empty-text">這個分類還沒有成就</div>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = filtered.map(achievement => `
-        <div class="achievement-card ${achievement.unlocked ? '' : 'locked'} ${achievement.rarity === 'legendary' ? 'rare' : ''}">
-          <div class="achievement-badge ${achievement.unlocked ? '' : 'locked'}">
-            ${achievement.unlocked ? '✓ 已獲得' : '🔒 未解鎖'}
-          </div>
-          
-          <div class="achievement-icon">${achievement.icon}</div>
-          
-          <h3 class="achievement-title">${achievement.title}</h3>
-          <p class="achievement-desc">${achievement.desc}</p>
-          
-          ${achievement.unlocked ? `
-            <div class="achievement-date">
-              🎉 ${achievement.unlockedDate} 獲得
-            </div>
-            <div class="achievement-reward">
-              ⭐ +${achievement.points} 成就點數
-            </div>
-          ` : `
-            <div class="achievement-progress">
-              <div class="progress-label">
-                <span>進度</span>
-                <span>0%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" style="width: 0%"></div>
-              </div>
-            </div>
-          `}
-        </div>
-      `).join('');
-    }
-
-    // 切換分類
-    function filterCategory(category) {
-      currentCategory = category;
-      
-      // 更新標籤樣式
-      document.querySelectorAll('.category-tab').forEach(tab => {
-        tab.classList.remove('active');
+      // 2. 🔥 載入使用者已解鎖的成就
+      const userAchievementsResult = await makeRequest({
+        action: 'getUserAchievements',
+        userId: currentUser.userId
       });
-      event.target.classList.add('active');
+
+      const unlockedIds = userAchievementsResult.data.map(a => a.achievementId);
+      const unlockedMap = {};
+      userAchievementsResult.data.forEach(a => {
+        unlockedMap[a.achievementId] = {
+          date: a.unlockedDate,
+          time: a.unlockedTime
+        };
+      });
+
+      // 3. 組合資料
+      allAchievements = achievementsResult.data.map(achievement => ({
+        ...achievement,
+        unlocked: unlockedIds.includes(achievement.id),
+        unlockedDate: unlockedMap[achievement.id]?.date || null,
+        unlockedTime: unlockedMap[achievement.id]?.time || null
+      }));
+
+      // 4. 更新統計
+      updateStats();
       
-      // 重新顯示
+      // 5. 顯示成就
       displayAchievements();
+
+    } catch (err) {
+      console.error('載入失敗:', err);
+      alert('載入成就時發生錯誤');
+    }
+  }
+
+  // 更新統計
+  function updateStats() {
+    const unlocked = allAchievements.filter(a => a.unlocked);
+    const totalPoints = unlocked.reduce((sum, a) => sum + a.points, 0);
+    const rareCount = unlocked.filter(a => a.rarity === 'rare' || a.rarity === 'legendary').length;
+    
+    document.getElementById('totalAchievements').textContent = unlocked.length;
+    document.getElementById('completionRate').textContent = 
+      Math.round((unlocked.length / allAchievements.length) * 100) + '%';
+    document.getElementById('totalPoints').textContent = totalPoints;
+    document.getElementById('rareCount').textContent = rareCount;
+  }
+
+  // 顯示成就
+  function displayAchievements() {
+    const grid = document.getElementById('achievementsGrid');
+    
+    const filtered = currentCategory === 'all' 
+      ? allAchievements 
+      : allAchievements.filter(a => a.category === currentCategory);
+    
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-text">這個分類還沒有成就</div>
+        </div>
+      `;
+      return;
     }
 
-    // 頁面載入
-    window.onload = loadAchievements;
+    grid.innerHTML = filtered.map(achievement => `
+      <div class="achievement-card ${achievement.unlocked ? '' : 'locked'} ${achievement.rarity === 'legendary' ? 'rare' : ''}">
+        <div class="achievement-badge ${achievement.unlocked ? '' : 'locked'}">
+          ${achievement.unlocked ? '✓ 已獲得' : '🔒 未解鎖'}
+        </div>
+        
+        <div class="achievement-icon">${achievement.icon}</div>
+        
+        <h3 class="achievement-title">${achievement.title}</h3>
+        <p class="achievement-desc">${achievement.desc}</p>
+        
+        ${achievement.unlocked ? `
+          <div class="achievement-date">
+            🎉 ${achievement.unlockedDate} ${achievement.unlockedTime} 獲得
+          </div>
+          <div class="achievement-reward">
+            ⭐ +${achievement.points} 成就點數
+          </div>
+        ` : `
+          <div class="achievement-progress">
+            <div class="progress-label">
+              <span>進度</span>
+              <span>0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        `}
+      </div>
+    `).join('');
+  }
 
-    // 更新 Header UI
-    function updateHeaderUI() {
+  // 切換分類
+  function filterCategory(category) {
+    currentCategory = category;
+    
+    // 更新標籤樣式
+    document.querySelectorAll('.category-tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // 重新顯示
+    displayAchievements();
+  }
+
+  // 更新 Header UI
+  function updateHeaderUI() {
     if (!currentUser) return;
     
     const navRight = document.getElementById('headerNav');
     navRight.innerHTML = `
-        <div class="user-menu" id="userMenu">
+      <div class="user-menu" id="userMenu">
         <div class="user-display" onclick="toggleUserMenu()">
-            <img src="${currentUser.avatar}" alt="avatar" class="user-avatar">
-            <div class="user-info">
+          <img src="${currentUser.avatar}" alt="avatar" class="user-avatar">
+          <div class="user-info">
             <span class="user-name">${currentUser.displayName}</span>
             <span class="user-stats">完成 ${currentUser.completedCourses || 0} 課程</span>
-            </div>
-            <span class="dropdown-arrow">▼</span>
+          </div>
+          <span class="dropdown-arrow">▼</span>
         </div>
         
         <div class="dropdown-menu">
-            <a href="dashboard.html" class="dropdown-item">
+          <a href="dashboard.html" class="dropdown-item">
             <span class="dropdown-icon">📊</span>
             <div class="dropdown-text">
-                <span class="dropdown-label">學習分析</span>
-                <span class="dropdown-desc">查看學習進度與統計</span>
+              <span class="dropdown-label">學習分析</span>
+              <span class="dropdown-desc">查看學習進度與統計</span>
             </div>
-            </a>
-            
-            <a href="achievements.html" class="dropdown-item">
+          </a>
+          
+          <a href="achievements.html" class="dropdown-item">
             <span class="dropdown-icon">🏆</span>
             <div class="dropdown-text">
-                <span class="dropdown-label">成就系統</span>
-                <span class="dropdown-desc">查看獲得的成就與徽章</span>
+              <span class="dropdown-label">成就系統</span>
+              <span class="dropdown-desc">查看獲得的成就與徽章</span>
             </div>
-            </a>
-            
-            <div class="dropdown-divider"></div>
-            
-            <div class="dropdown-item logout" onclick="logout()">
+          </a>
+          
+          <div class="dropdown-divider"></div>
+          
+          <div class="dropdown-item logout" onclick="logout()">
             <span class="dropdown-icon">🚪</span>
             <div class="dropdown-text">
-                <span class="dropdown-label">登出</span>
+              <span class="dropdown-label">登出</span>
             </div>
-            </div>
+          </div>
         </div>
-        </div>
+      </div>
     `;
-    }
+  }
 
-    // 切換選單
-    function toggleUserMenu() {
+  // 切換選單
+  function toggleUserMenu() {
     const menu = document.getElementById('userMenu');
     menu.classList.toggle('open');
-    }
+  }
 
-    // 點擊外部關閉
-    document.addEventListener('click', function(event) {
+  // 點擊外部關閉
+  document.addEventListener('click', function(event) {
     const menu = document.getElementById('userMenu');
     if (menu && !menu.contains(event.target)) {
-        menu.classList.remove('open');
+      menu.classList.remove('open');
     }
-    });
+  });
 
-    // 登出
-    function logout() {
+  // 登出
+  function logout() {
     if (confirm('確定要登出嗎?')) {
-        localStorage.removeItem('currentUser');
-        location.href = 'index.html';
+      localStorage.removeItem('currentUser');
+      location.href = 'index.html';
     }
-    }
+  }
+
+  // 頁面載入
+  window.onload = loadAchievements;
   </script>
 </body>
 </html>

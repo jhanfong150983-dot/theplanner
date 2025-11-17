@@ -952,6 +952,137 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-15px); }
     }
+
+    /* 使用者下拉選單 */
+    .user-menu {
+      position: relative;
+      display: inline-block;
+    }
+
+    .user-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-display:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .user-info {
+      color: white;
+      text-align: left;
+    }
+
+    .user-name {
+      font-weight: bold;
+      font-size: 14px;
+      display: block;
+    }
+
+    .user-stats {
+      font-size: 11px;
+      opacity: 0.85;
+      display: block;
+    }
+
+    .dropdown-arrow {
+      font-size: 12px;
+      color: white;
+      transition: transform 0.3s;
+    }
+
+    .user-menu.open .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* 下拉選單內容 */
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      min-width: 220px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+
+    .user-menu.open .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #f8f9fa;
+    }
+
+    .dropdown-icon {
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+    }
+
+    .dropdown-text {
+      flex: 1;
+    }
+
+    .dropdown-label {
+      font-weight: 600;
+      font-size: 14px;
+      display: block;
+      color: #2d3748;
+    }
+
+    .dropdown-desc {
+      font-size: 11px;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 8px 0;
+    }
+
+    .dropdown-item.logout {
+      color: #e53e
+    }
   </style>
 </head>
 <body>
@@ -1680,6 +1811,30 @@ function drawConnections() {
         const completeTime = new Date();
         const learningSeconds = Math.floor((completeTime - window.skillStartTime) / 1000);
         const learningTime = formatTimeHHMMSS(learningSeconds); 
+
+        // 🔥 檢查並解鎖成就
+        if (currentUser) {
+          makeRequest({
+            action: 'checkAndUnlockAchievements',
+            userId: currentUser.userId,
+            streakDays: 7, // 從實際資料讀取
+            perfectQuizzes: 0,
+            firstTryStreak: 0,
+            mainSkillsCompleted: 0,
+            sideSkillsCompleted: 0,
+            skillsInOneDay: 0,
+            lateNightLearning: 0,
+            earlyMorningLearning: 0
+          }).then(result => {
+            if (result.success && result.newlyUnlocked.length > 0) {
+              // 🔥 顯示解鎖的新成就
+              result.newlyUnlocked.forEach(achievement => {
+                console.log(`🏆 解鎖新成就: ${achievement.title}`);
+                // 可以加入彈出通知
+              });
+            }
+          });
+        }
 
         // 🔥 修正：使用 updateSkillProgress 更新技能進度表
         makeRequest({
