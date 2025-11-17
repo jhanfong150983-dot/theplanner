@@ -216,17 +216,149 @@
     @media (max-width: 420px) {
         .card { width: 100%; }
     }
+
+    /* 使用者下拉選單 */
+    .user-menu {
+    position: relative;
+    display: inline-block;
+    }
+
+    .user-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-display:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    }
+
+    .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+    }
+
+    .user-info {
+    color: white;
+    text-align: left;
+    }
+
+    .user-name {
+    font-weight: bold;
+    font-size: 14px;
+    display: block;
+    }
+
+    .user-stats {
+    font-size: 11px;
+    opacity: 0.85;
+    display: block;
+    }
+
+    .dropdown-arrow {
+    font-size: 12px;
+    color: white;
+    transition: transform 0.3s;
+    }
+
+    .user-menu.open .dropdown-arrow {
+    transform: rotate(180deg);
+    }
+
+    /* 下拉選單內容 */
+    .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    }
+
+    .user-menu.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    }
+
+    .dropdown-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    text-decoration: none;
+    }
+
+    .dropdown-item:last-child {
+    border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+    background: #f8f9fa;
+    }
+
+    .dropdown-icon {
+    font-size: 20px;
+    width: 24px;
+    text-align: center;
+    }
+
+    .dropdown-text {
+    flex: 1;
+    }
+
+    .dropdown-label {
+    font-weight: 600;
+    font-size: 14px;
+    display: block;
+    color: #2d3748;
+    }
+
+    .dropdown-desc {
+    font-size: 11px;
+    color: #718096;
+    margin-top: 2px;
+    }
+
+    .dropdown-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+    }
+
+    .dropdown-item.logout {
+    color: #e53e3e;
+    }
+
+    .dropdown-item.logout:hover {
+    background: #fff5f5;
+    }
   </style>
 </head>
 <body>
   <header>
     <nav class="nav-left">
-        <a href="#" class="logo-link">
+        <a href="index.html" class="logo-link">
         <img src="assets/logo.png" alt="Logo" style="height:40px; width:auto;" onerror="this.style.display='none'">
         </a>
-        <button class="nav-btn">主線任務</button>
-        <button class="nav-btn">支線任務</button>
-        <button class="nav-btn" onclick="goToDashboard()">學習分析</button>
     </nav>
 
     <div class="nav-right" id="navRight">
@@ -329,23 +461,49 @@
     // 📌 2. 更新 UI 顯示使用者資訊
     // ============================================
     function updateUIAfterLogin(user) {
-      const navRight = document.getElementById('navRight');
-      navRight.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="${user.avatar}" alt="avatar" 
-               style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid white;">
-          <div style="color: white; text-align: left;">
-            <div style="font-weight: bold; font-size: 14px;">${user.displayName}</div>
-            <div style="font-size: 11px; opacity: 0.85;" id="statsText">
-              完成 ${user.completedCourses || 0} 課程
-              <span class="loading-stats" id="loadingStats">載入中...</span>
+    const navRight = document.getElementById('navRight');
+    navRight.innerHTML = `
+        <div class="user-menu" id="userMenu">
+        <div class="user-display" onclick="toggleUserMenu()">
+            <img src="${user.avatar}" alt="avatar" class="user-avatar">
+            <div class="user-info">
+            <span class="user-name">${user.displayName}</span>
+            <span class="user-stats" id="statsText">
+                完成 ${user.completedCourses || 0} 課程
+                <span class="loading-stats" id="loadingStats">載入中...</span>
+            </span>
             </div>
-          </div>
-          <button class="nav-btn" onclick="logout()" style="background: rgba(255,255,255,0.1);">
-            登出
-          </button>
+            <span class="dropdown-arrow">▼</span>
         </div>
-      `;
+        
+        <div class="dropdown-menu">
+            <a href="dashboard.html" class="dropdown-item">
+            <span class="dropdown-icon">📊</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">學習分析</span>
+                <span class="dropdown-desc">查看學習進度與統計</span>
+            </div>
+            </a>
+            
+            <a href="achievements.html" class="dropdown-item">
+            <span class="dropdown-icon">🏆</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">成就系統</span>
+                <span class="dropdown-desc">查看獲得的成就與徽章</span>
+            </div>
+            </a>
+            
+            <div class="dropdown-divider"></div>
+            
+            <div class="dropdown-item logout" onclick="logout()">
+            <span class="dropdown-icon">🚪</span>
+            <div class="dropdown-text">
+                <span class="dropdown-label">登出</span>
+            </div>
+            </div>
+        </div>
+        </div>
+    `;
     }
     
     // ============================================
@@ -479,6 +637,21 @@
       window.location.href = 'dashboard.html';
     }
     
+    // 切換使用者選單
+    function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    menu.classList.toggle('open');
+    }
+
+    // 點擊外部關閉選單
+    document.addEventListener('click', function(event) {
+    const menu = document.getElementById('userMenu');
+    if (menu && !menu.contains(event.target)) {
+        menu.classList.remove('open');
+    }
+    });
+
+
     // ============================================
     // 📌 7. 登出
     // ============================================

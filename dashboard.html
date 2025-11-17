@@ -3,129 +3,169 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>學習分析 Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+  <title>學習歷程 - THE PLANNER</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
       padding: 20px;
-      color: #333;
     }
 
-    .dashboard {
-      max-width: 1400px;
+    .container {
+      max-width: 900px;
       margin: 0 auto;
     }
 
-    .header {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
+    /* 🎉 第一眼：成就橫幅 */
+    .hero-banner {
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      border-radius: 24px;
+      padding: 40px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      animation: slideDown 0.6s ease-out;
     }
 
-    .header h1 {
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-icon {
+      font-size: 80px;
+      margin-bottom: 15px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero-title {
       font-size: 32px;
-      color: #667eea;
+      font-weight: bold;
+      color: #2d3748;
       margin-bottom: 10px;
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-top: 15px;
-    }
-
-    .avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      border: 3px solid #667eea;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+    .hero-subtitle {
+      font-size: 18px;
+      color: #4a5568;
       margin-bottom: 20px;
     }
 
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
     }
 
-    .card:hover {
-      transform: translateY(-5px);
+    .hero-stat {
+      text-align: center;
+    }
+
+    .hero-stat-value {
+      font-size: 48px;
+      font-weight: bold;
+      color: #2d3748;
+      display: block;
+    }
+
+    .hero-stat-label {
+      font-size: 14px;
+      color: #4a5568;
+      margin-top: 5px;
+    }
+
+    /* 📊 第二眼：進度卡片 */
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .card-icon {
+      font-size: 32px;
     }
 
     .card-title {
-      font-size: 18px;
-      font-weight: bold;
-      color: #667eea;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .stat-box {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px;
-      background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .stat-value {
       font-size: 24px;
       font-weight: bold;
-      color: #667eea;
+      color: #2d3748;
+    }
+
+    /* 進度條 */
+    .progress-section {
+      margin: 20px 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #4a5568;
     }
 
     .progress-bar {
-      width: 100%;
-      height: 12px;
-      background: #e0e0e0;
-      border-radius: 6px;
+      height: 20px;
+      background: #e2e8f0;
+      border-radius: 10px;
       overflow: hidden;
-      margin: 10px 0;
+      position: relative;
     }
 
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-      transition: width 0.5s ease;
-      border-radius: 6px;
+      border-radius: 10px;
+      transition: width 1s ease-out;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
     }
 
-    .skill-tree-mini {
+    /* 技能樹小卡片 */
+    .skill-badges {
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
-      margin-top: 15px;
+      margin: 15px 0;
     }
 
     .skill-badge {
-      padding: 8px 15px;
+      padding: 10px 16px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .skill-completed {
@@ -139,549 +179,456 @@
     }
 
     .skill-locked {
-      background: #f8d7da;
-      color: #721c24;
-      opacity: 0.5;
+      background: #e2e8f0;
+      color: #718096;
     }
 
-    .chart-container {
-      position: relative;
-      height: 250px;
-      margin-top: 15px;
-    }
-
-    .achievement-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .achievement-item {
-      display: flex;
-      align-items: center;
+    /* 💪 第三眼：強項展示 */
+    .strength-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 10px;
-      border-left: 4px solid #667eea;
+      margin: 20px 0;
     }
 
-    .achievement-icon {
-      font-size: 32px;
+    .strength-item {
+      background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+      padding: 20px;
+      border-radius: 16px;
+      text-align: center;
+      border: 2px solid #28a745;
     }
 
-    .achievement-info h4 {
-      font-size: 14px;
-      color: #333;
-      margin-bottom: 5px;
-    }
-
-    .achievement-info p {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .weak-point {
-      padding: 12px;
-      background: #fff3cd;
-      border-left: 4px solid #ffc107;
-      border-radius: 8px;
+    .strength-icon {
+      font-size: 40px;
       margin-bottom: 10px;
     }
 
-    .weak-point h4 {
-      color: #856404;
-      font-size: 14px;
+    .strength-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #155724;
       margin-bottom: 5px;
     }
 
-    .weak-point p {
-      color: #666;
+    .strength-desc {
       font-size: 13px;
+      color: #155724;
+      opacity: 0.8;
     }
 
-    .recommendation {
-      padding: 12px;
-      background: #d1ecf1;
-      border-left: 4px solid #17a2b8;
+    /* 📝 第四眼：溫和的建議 */
+    .suggestion-box {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      padding: 20px;
+      border-radius: 16px;
+      margin: 20px 0;
+      border-left: 5px solid #2196f3;
+    }
+
+    .suggestion-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .suggestion-icon {
+      font-size: 32px;
+    }
+
+    .suggestion-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1565c0;
+    }
+
+    .suggestion-content {
+      font-size: 15px;
+      color: #1565c0;
+      line-height: 1.6;
+    }
+
+    .next-action {
+      background: white;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .action-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
       border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.3s;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* 🔥 連續學習 */
+    .streak-display {
+      text-align: center;
+      padding: 30px;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+      border-radius: 16px;
+      margin: 20px 0;
+    }
+
+    .streak-number {
+      font-size: 72px;
+      font-weight: bold;
+      color: #ff6b6b;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .streak-label {
+      font-size: 18px;
+      color: #856404;
       margin-top: 10px;
     }
 
-    .learning-streak {
+    .streak-calendar {
       display: flex;
-      gap: 5px;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
       flex-wrap: wrap;
-      margin-top: 15px;
     }
 
     .day-box {
-      width: 30px;
-      height: 30px;
-      border-radius: 4px;
-      background: #e0e0e0;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #fff;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
+      font-size: 11px;
       font-weight: bold;
+      color: #999;
+      transition: all 0.3s;
     }
 
     .day-active {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+      transform: scale(1.1);
     }
 
-    .comparison-card {
-      display: flex;
-      justify-content: space-between;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 10px;
-      margin-bottom: 10px;
+    .day-label {
+      font-size: 9px;
+      margin-top: 2px;
     }
 
-    .comparison-label {
-      font-size: 14px;
-      color: #666;
+    /* 📈 詳細數據 (可展開) */
+    .detail-toggle {
+      text-align: center;
+      margin: 30px 0;
     }
 
-    .comparison-bars {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .bar {
-      height: 20px;
-      background: #667eea;
-      border-radius: 10px;
-      min-width: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 11px;
-      font-weight: bold;
-    }
-
-    .tab-container {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+    .toggle-btn {
       background: white;
-      padding: 10px;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 12px 30px;
       border-radius: 12px;
-    }
-
-    .tab {
-      padding: 10px 20px;
-      border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: bold;
+      font-size: 16px;
       transition: all 0.3s;
     }
 
-    .tab:hover {
-      background: #667eea15;
-    }
-
-    .tab.active {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .toggle-btn:hover {
+      background: #667eea;
       color: white;
     }
 
+    .detail-content {
+      display: none;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .detail-content.show {
+      display: block;
+    }
+
+    /* 返回按鈕 */
+    .back-btn {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    }
+
     @media (max-width: 768px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .hero-stats { gap: 20px; }
+      .hero-stat-value { font-size: 36px; }
+      .hero-title { font-size: 24px; }
+      .strength-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="dashboard">
-    <!-- Header -->
-    <div class="header">
-      <h1>📊 學習分析儀表板</h1>
-      <div class="user-info">
-        <img src="https://ui-avatars.com/api/?name=Student&background=667eea&color=fff" 
-             alt="Avatar" class="avatar">
-        <div>
-          <h3>王小明</h3>
-          <p style="color: #666; font-size: 14px;">國小五年級 | 已學習 30 天</p>
+  <div class="container">
+    <!-- 返回按鈕 -->
+    <button class="back-btn" onclick="location.href='index.html'">← 返回首頁</button>
+
+    <!-- 🎉 第一眼：成就橫幅 -->
+    <div class="hero-banner">
+      <div class="hero-icon">🏆</div>
+      <h1 class="hero-title" id="userName">載入中...</h1>
+      <p class="hero-subtitle">你的學習旅程</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-value" id="totalSkills">0</span>
+          <span class="hero-stat-label">完成技能</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" id="totalTime">00:00:00</span>
+          <span class="hero-stat-label">學習時間</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-value" id="avgScore">0%</span>
+          <span class="hero-stat-label">平均分數</span>
         </div>
       </div>
     </div>
 
-    <!-- 學習總覽 -->
-    <div class="grid">
-      <div class="card">
-        <div class="card-title">🎯 學習總覽</div>
-        <div class="stat-box">
-          <span class="stat-label">總學習時數</span>
-          <span class="stat-value">24.5h</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">完成課程</span>
-          <span class="stat-value">12/20</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-label">平均分數</span>
-          <span class="stat-value">87%</span>
+    <!-- 📊 第二眼：學習進度 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🌳</span>
+        <h2 class="card-title">技能樹進度</h2>
+      </div>
+      
+      <div class="skill-badges" id="skillBadges">
+        <div class="skill-badge skill-completed">✓ 載入中...</div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-label">
+          <span>整體進度</span>
+          <span id="overallProgress">0%</span>
         </div>
         <div class="progress-bar">
-          <div class="progress-fill" style="width: 60%"></div>
-        </div>
-        <p style="text-align: center; font-size: 12px; color: #666; margin-top: 10px;">
-          整體進度 60%
-        </p>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🌳 技能樹進度</div>
-        <div class="skill-tree-mini">
-          <span class="skill-badge skill-completed">✓ 基礎介紹</span>
-          <span class="skill-badge skill-completed">✓ 介面設計</span>
-          <span class="skill-badge skill-progress">⏳ 程式邏輯</span>
-          <span class="skill-badge skill-locked">🔒 遊戲製作</span>
-          <span class="skill-badge skill-locked">🔒 專題發表</span>
-        </div>
-        <div style="margin-top: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span style="font-size: 13px; color: #666;">主線進度</span>
-            <span style="font-size: 13px; font-weight: bold; color: #667eea;">3/5</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 60%"></div>
-          </div>
-        </div>
-        <div style="margin-top: 15px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span style="font-size: 13px; color: #666;">支線進度</span>
-            <span style="font-size: 13px; font-weight: bold; color: #9333ea;">2/3</span>
-          </div>
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: 66%; background: linear-gradient(90deg, #9333ea 0%, #c084fc 100%);"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">🔥 連續學習</div>
-        <div style="text-align: center; margin: 20px 0;">
-          <div style="font-size: 48px; font-weight: bold; color: #667eea;">7</div>
-          <div style="color: #666; font-size: 14px;">連續學習天數</div>
-        </div>
-        <div class="learning-streak">
-          <div class="day-box day-active" title="2024-01-15">一</div>
-          <div class="day-box day-active" title="2024-01-16">二</div>
-          <div class="day-box day-active" title="2024-01-17">三</div>
-          <div class="day-box day-active" title="2024-01-18">四</div>
-          <div class="day-box day-active" title="2024-01-19">五</div>
-          <div class="day-box day-active" title="2024-01-20">六</div>
-          <div class="day-box day-active" title="2024-01-21">日</div>
-          <div class="day-box" title="未來">一</div>
-          <div class="day-box" title="未來">二</div>
-          <div class="day-box" title="未來">三</div>
-        </div>
-        <p style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 8px; font-size: 13px; color: #155724;">
-          🎉 太棒了!再堅持 3 天就能達成 10 天連續學習成就!
-        </p>
-      </div>
-    </div>
-
-    <!-- 影片與測驗狀況 -->
-    <div class="grid">
-      <div class="card">
-        <div class="card-title">📹 影片觀看分析</div>
-        <div class="chart-container">
-          <canvas id="videoChart"></canvas>
-        </div>
-        <div style="margin-top: 15px;">
-          <div class="stat-box">
-            <span class="stat-label">平均觀看完成度</span>
-            <span class="stat-value">92%</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-label">重複觀看次數</span>
-            <span class="stat-value">3</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📝 測驗表現</div>
-        <div class="chart-container">
-          <canvas id="quizChart"></canvas>
-        </div>
-        <div style="margin-top: 15px;">
-          <div class="stat-box">
-            <span class="stat-label">平均嘗試次數</span>
-            <span class="stat-value">1.5</span>
-          </div>
-          <div class="stat-box">
-            <span class="stat-label">一次通過率</span>
-            <span class="stat-value">75%</span>
-          </div>
+          <div class="progress-fill" id="overallProgressBar" style="width: 0%"></div>
         </div>
       </div>
     </div>
 
-    <!-- 弱點分析與推薦 -->
-    <div class="card" style="margin-bottom: 20px;">
-      <div class="card-title">💡 弱點分析與推薦</div>
-      <div class="weak-point">
-        <h4>⚠️ 程式邏輯 - 迴圈結構</h4>
-        <p>在「程式邏輯」課程中,你在迴圈結構的題目上嘗試了 3 次才通過,建議加強練習。</p>
-      </div>
-      <div class="weak-point">
-        <h4>⚠️ 測驗時間較長</h4>
-        <p>你的平均測驗時間為 8 分鐘,比同年齡段平均多 2 分鐘,可能需要更熟悉題型。</p>
-      </div>
-      <div class="recommendation">
-        <h4>💡 學習建議</h4>
-        <p>建議回顧「基礎介紹」中的變數概念,這將幫助你更好地理解迴圈結構。</p>
-      </div>
-      <div class="recommendation">
-        <h4>💡 推薦課程</h4>
-        <p>準備好挑戰「遊戲製作」了!你已經掌握了足夠的基礎知識。</p>
+    <!-- 🔥 連續學習 -->
+    <div class="streak-display">
+      <div class="streak-number" id="streakDays">0</div>
+      <div class="streak-label">天連續學習</div>
+      <div class="streak-calendar" id="streakCalendar">
+        <!-- 動態生成 -->
       </div>
     </div>
 
-    <!-- 學習行為分析 -->
-    <div class="grid">
-      <div class="card">
-        <div class="card-title">⏰ 學習時段分析</div>
-        <div class="chart-container">
-          <canvas id="timeChart"></canvas>
-        </div>
-        <p style="margin-top: 15px; font-size: 13px; color: #666;">
-          你最常在 <strong style="color: #667eea;">晚上 19:00-21:00</strong> 學習,
-          建議保持這個習慣!
-        </p>
+    <!-- 💪 第三眼：你的強項 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">💪</span>
+        <h2 class="card-title">你的強項</h2>
       </div>
-
-      <div class="card">
-        <div class="card-title">📈 每週學習趨勢</div>
-        <div class="chart-container">
-          <canvas id="weeklyChart"></canvas>
-        </div>
-        <p style="margin-top: 15px; font-size: 13px; color: #666;">
-          本週學習時長比上週增加了 <strong style="color: #10b981;">30%</strong>,繼續加油!
-        </p>
-      </div>
-    </div>
-
-    <!-- 比較分析 -->
-    <div class="card" style="margin-top: 20px;">
-      <div class="card-title">📊 表現比較</div>
       
-      <h4 style="margin: 15px 0 10px 0; font-size: 16px; color: #667eea;">
-        vs 同年齡段學習者
-      </h4>
-      <div class="comparison-card">
-        <span class="comparison-label">平均學習時長</span>
-        <div class="comparison-bars">
-          <div class="bar" style="width: 120px;">你: 2.5h</div>
-          <div class="bar" style="width: 80px; background: #ccc;">平均: 2h</div>
+      <div class="strength-grid" id="strengthGrid">
+        <div class="strength-item">
+          <div class="strength-icon">⚡</div>
+          <div class="strength-title">快速學習</div>
+          <div class="strength-desc">平均完成速度比其他學習者快 20%</div>
         </div>
-      </div>
-      <div class="comparison-card">
-        <span class="comparison-label">課程完成數</span>
-        <div class="comparison-bars">
-          <div class="bar" style="width: 100px;">你: 12</div>
-          <div class="bar" style="width: 80px; background: #ccc;">平均: 10</div>
-        </div>
-      </div>
-      <div class="comparison-card">
-        <span class="comparison-label">測驗平均分數</span>
-        <div class="comparison-bars">
-          <div class="bar" style="width: 110px;">你: 87%</div>
-          <div class="bar" style="width: 100px; background: #ccc;">平均: 82%</div>
-        </div>
-      </div>
-
-      <h4 style="margin: 25px 0 10px 0; font-size: 16px; color: #667eea;">
-        個人成長軌跡
-      </h4>
-      <div class="chart-container">
-        <canvas id="growthChart"></canvas>
       </div>
     </div>
 
-    <!-- 成就系統 -->
-    <div class="card" style="margin-top: 20px;">
-      <div class="card-title">🏆 成就與徽章</div>
-      <div class="achievement-list">
-        <div class="achievement-item">
-          <div class="achievement-icon">🎯</div>
-          <div class="achievement-info">
-            <h4>初心者</h4>
-            <p>完成第一個課程 | 獲得時間: 2024-01-10</p>
-          </div>
+    <!-- 📝 第四眼：給你的建議 -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">💡</span>
+        <h2 class="card-title">給你的建議</h2>
+      </div>
+
+      <div class="suggestion-box">
+        <div class="suggestion-header">
+          <span class="suggestion-icon">🎯</span>
+          <span class="suggestion-title">下一步建議</span>
         </div>
-        <div class="achievement-item">
-          <div class="achievement-icon">🔥</div>
-          <div class="achievement-info">
-            <h4>連續學習者</h4>
-            <p>連續學習 7 天 | 獲得時間: 2024-01-17</p>
-          </div>
+        <div class="suggestion-content" id="suggestionContent">
+          載入中...
         </div>
-        <div class="achievement-item">
-          <div class="achievement-icon">💯</div>
-          <div class="achievement-info">
-            <h4>完美主義者</h4>
-            <p>10 次測驗都獲得滿分 | 獲得時間: 2024-01-15</p>
-          </div>
+        <div class="next-action">
+          <span class="action-text">準備好挑戰下一關了嗎？</span>
+          <button class="action-btn" onclick="location.href='learning.html?project=appinventor'">
+            開始學習 →
+          </button>
         </div>
-        <div class="achievement-item" style="opacity: 0.5;">
-          <div class="achievement-icon">🌟</div>
-          <div class="achievement-info">
-            <h4>全能學習者 (未獲得)</h4>
-            <p>完成所有課程 | 進度: 12/20</p>
-          </div>
+      </div>
+    </div>
+
+    <!-- 📈 詳細數據 (可選) -->
+    <div class="detail-toggle">
+      <button class="toggle-btn" onclick="toggleDetail()">
+        📊 查看詳細學習數據
+      </button>
+    </div>
+
+    <div class="detail-content" id="detailContent">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">📹</span>
+          <h2 class="card-title">影片觀看紀錄</h2>
         </div>
+        <div id="videoDetails">載入中...</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">📝</span>
+          <h2 class="card-title">測驗表現紀錄</h2>
+        </div>
+        <div id="quizDetails">載入中...</div>
       </div>
     </div>
   </div>
 
   <script>
-    // 影片觀看分析圖表
-    const videoCtx = document.getElementById('videoChart').getContext('2d');
-    new Chart(videoCtx, {
-      type: 'bar',
-      data: {
-        labels: ['基礎介紹', '介面設計', '音效設計', '程式邏輯'],
-        datasets: [{
-          label: '觀看完成度(%)',
-          data: [100, 95, 88, 92],
-          backgroundColor: 'rgba(102, 126, 234, 0.6)',
-          borderColor: 'rgba(102, 126, 234, 1)',
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true, max: 100 }
-        }
-      }
-    });
-
-    // 測驗表現圖表
-    const quizCtx = document.getElementById('quizChart').getContext('2d');
-    new Chart(quizCtx, {
-      type: 'line',
-      data: {
-        labels: ['第1次', '第2次', '第3次', '第4次', '第5次', '第6次'],
-        datasets: [{
-          label: '測驗分數',
-          data: [75, 80, 90, 85, 95, 100],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true, max: 100 }
-        }
-      }
-    });
-
-    // 學習時段分析
-    const timeCtx = document.getElementById('timeChart').getContext('2d');
-    new Chart(timeCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['早上(8-12)', '下午(12-18)', '晚上(18-24)'],
-        datasets: [{
-          data: [10, 20, 70],
-          backgroundColor: ['#fbbf24', '#60a5fa', '#8b5cf6']
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-
-    // 每週學習趨勢
-    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
-    new Chart(weeklyCtx, {
-      type: 'bar',
-      data: {
-        labels: ['週一', '週二', '週三', '週四', '週五', '週六', '週日'],
-        datasets: [{
-          label: '學習時長(分鐘)',
-          data: [45, 60, 30, 75, 90, 120, 80],
-          backgroundColor: 'rgba(102, 126, 234, 0.6)'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-
-    // 個人成長軌跡
-    const growthCtx = document.getElementById('growthChart').getContext('2d');
-    new Chart(growthCtx, {
-      type: 'line',
-      data: {
-        labels: ['第1週', '第2週', '第3週', '第4週'],
-        datasets: [{
-          label: '完成課程數',
-          data: [2, 5, 9, 12],
-          borderColor: '#667eea',
-          backgroundColor: 'rgba(102, 126, 234, 0.1)',
-          tension: 0.4,
-          fill: true
-        }, {
-          label: '平均分數',
-          data: [75, 80, 85, 87],
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          tension: 0.4,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false
-      }
-    });
-
-    async function loadDashboardData() {
-    if (!currentUser) {
-        window.location.href = 'login.html';
-        return;
-    }
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby292a8Rs_CUyxqoWlcE_-Slfg4Sn0LqjMhirb02voYO037wBvZI4KzN8lAJp6LlTdP/exec';
     
-    try {
-        // 讀取各種資料
-        const [progress, videos, quizzes, daily] = await Promise.all([
-        makeRequest({ action: 'getLearningProgress', userId: currentUser.userId }),
-        makeRequest({ action: 'getVideoStats', userId: currentUser.userId }),
-        makeRequest({ action: 'getQuizStats', userId: currentUser.userId }),
-        makeRequest({ action: 'getDailyLearning', userId: currentUser.userId })
-        ]);
-        
-        // 更新 Dashboard 圖表
-        updateProgressCharts(progress.data);
-        updateVideoCharts(videos.data);
-        updateQuizCharts(quizzes.data);
-        updateStreakDisplay(daily.data);
-        
-    } catch (err) {
-        console.error('載入Dashboard失敗:', err);
+    let currentUser = null;
+    let detailVisible = false;
+
+    // JSONP 請求
+    function makeRequest(data) {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'jsonp_' + Date.now();
+        window[callbackName] = function(response) {
+          delete window[callbackName];
+          resolve(response);
+        };
+        const params = new URLSearchParams({ callback: callbackName, ...data });
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?${params}`;
+        script.onerror = () => reject(new Error('請求失敗'));
+        document.body.appendChild(script);
+        setTimeout(() => {
+          if (window[callbackName]) reject(new Error('請求超時'));
+        }, 15000);
+      });
     }
+
+    // 載入數據
+    async function loadDashboard() {
+      const userData = localStorage.getItem('currentUser');
+      if (!userData) {
+        alert('請先登入');
+        location.href = 'login.html';
+        return;
+      }
+
+      currentUser = JSON.parse(userData);
+      document.getElementById('userName').textContent = `${currentUser.displayName} 的學習成果`;
+
+      try {
+        // 載入統計
+        const stats = await makeRequest({
+          action: 'getUserStats',
+          userId: currentUser.userId
+        });
+
+        if (stats.success) {
+          document.getElementById('totalSkills').textContent = stats.data.completedCourses || 0;
+          document.getElementById('totalTime').textContent = stats.data.totalTime || '00:00:00';
+          document.getElementById('avgScore').textContent = '87%'; // 示例
+          document.getElementById('overallProgress').textContent = 
+            Math.round((stats.data.completedCourses / 20) * 100) + '%';
+          document.getElementById('overallProgressBar').style.width = 
+            Math.round((stats.data.completedCourses / 20) * 100) + '%';
+        }
+
+        // 載入技能進度
+        const progress = await makeRequest({
+          action: 'getUserProgress',
+          userId: currentUser.userId,
+          courseId: 'appinventor'
+        });
+
+        if (progress.success) {
+          displaySkillBadges(progress.data.completedSkills || []);
+        }
+
+        // 生成建議
+        generateSuggestion(stats.data);
+
+      } catch (err) {
+        console.error('載入失敗:', err);
+      }
     }
+
+    // 顯示技能徽章
+    function displaySkillBadges(completed) {
+      const badges = document.getElementById('skillBadges');
+      const skills = ['基礎介紹', '介面設計', '程式邏輯', '遊戲製作', '專題發表'];
+      
+      badges.innerHTML = skills.map((skill, i) => {
+        const isCompleted = completed.includes(i + 1);
+        const className = isCompleted ? 'skill-completed' : 'skill-locked';
+        const icon = isCompleted ? '✓' : '🔒';
+        return `<div class="skill-badge ${className}">${icon} ${skill}</div>`;
+      }).join('');
+    }
+
+    // 生成建議
+    function generateSuggestion(stats) {
+      const suggestions = document.getElementById('suggestionContent');
+      const completed = stats.completedCourses || 0;
+
+      if (completed === 0) {
+        suggestions.textContent = '歡迎開始你的第一個技能！建議從「基礎介紹」開始，這會幫助你快速上手。';
+      } else if (completed < 5) {
+        suggestions.textContent = `你已經完成 ${completed} 個技能了！繼續保持這個節奏，很快就能解鎖更多有趣的內容。`;
+      } else {
+        suggestions.textContent = '你已經是高手了！準備挑戰最後的專題發表，展示你的學習成果吧！';
+      }
+    }
+
+    // 切換詳細數據
+    function toggleDetail() {
+      detailVisible = !detailVisible;
+      document.getElementById('detailContent').classList.toggle('show');
+      document.querySelector('.toggle-btn').textContent = 
+        detailVisible ? '📊 隱藏詳細數據' : '📊 查看詳細學習數據';
+    }
+
+    // 頁面載入
+    window.onload = loadDashboard;
   </script>
 </body>
 </html>
