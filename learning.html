@@ -1083,6 +1083,59 @@
     .dropdown-item.logout {
       color: #e53e
     }
+
+    /* 成就通知 */
+    .achievement-notification {
+      position: fixed;
+      top: 100px;
+      right: -400px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      z-index: 10000;
+      transition: right 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      max-width: 350px;
+    }
+
+    .achievement-notification.show {
+      right: 20px;
+    }
+
+    .achievement-notification-content {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .achievement-notification-icon {
+      font-size: 60px;
+      filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+    }
+
+    .achievement-notification-text {
+      flex: 1;
+    }
+
+    .achievement-notification-title {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    .achievement-notification-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 5px;
+    }
+
+    .achievement-notification-reward {
+      font-size: 14px;
+      color: #ffd700;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -1192,7 +1245,7 @@
     // 🔥 主要修正：API 和資料結構對應
     // ============================================
 
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4xJrP5BoQAh9M8snFAQuWQ3sXD_8eD_n0PLXYiCZxnDr2exP6h-KoUOfDGF2Wfw/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVfnpHt8ctOrolr0z3gR7hKxQoyNRDUKVC00w0GnpLniNltIwxDOdlPI10UaASt2Zu/exec';
 
     // YouTube 播放器相關
     let youtubePlayer = null;
@@ -1723,6 +1776,36 @@ function drawConnections() {
       });
     }
 
+    async function calculateUserStats() {
+    const stats = {
+      completedCourses: completedSkills.size,  // ✅ 使用實際值
+      mainSkillsCompleted: 0,
+      sideSkillsCompleted: 0,
+      // ...
+    };
+    
+    // 計算主線/支線
+    completedSkills.forEach(skillId => {
+      const skill = skills[skillId];
+      if (skill?.type === 'main') {
+        stats.mainSkillsCompleted++;
+      } else if (skill?.type === 'side') {
+        stats.sideSkillsCompleted++;
+      }
+    });
+    
+    // 從後端獲取其他統計
+    const quizRecords = await makeRequest({
+      action: 'getQuizRecords',
+      userId: currentUser.userId
+    });
+    
+    stats.perfectQuizzes = quizRecords.records.filter(r => r.score === 100).length;
+    
+    return stats;
+  }
+
+
     // 🔥 修正：提交測驗
     function submitQuiz() {
       const quiz = skills[currentSkillId].quiz;
@@ -1794,6 +1877,163 @@ function drawConnections() {
       document.getElementById('submitBtn').disabled = true;
     }
 
+    // ============================================
+// 🏆 成就系統修正 - 加入到 learning.html 的 <script> 中
+// 放在 completeSkill() 函數之前
+// ============================================
+
+/**
+ * 🔥 計算使用者的實際統計資料
+ */
+async function calculateUserStats() {
+  const stats = {
+    completedCourses: 0,        // 完成的技能數
+    streakDays: 1,              // 連續學習天數（簡化版）
+    perfectQuizzes: 0,          // 滿分測驗次數
+    firstTryStreak: 0,          // 連續一次通過
+    mainSkillsCompleted: 0,     // 完成的主線技能
+    sideSkillsCompleted: 0,     // 完成的支線技能
+    skillsInOneDay: 0,          // 單日完成技能數
+    lateNightLearning: 0,       // 深夜學習次數
+    earlyMorningLearning: 0     // 清晨學習次數
+  };
+  
+  // 1. 計算已完成的技能
+  stats.completedCourses = completedSkills.size;
+  
+  // 2. 計算主線和支線技能
+  completedSkills.forEach(skillId => {
+    const skill = skills[skillId];
+    if (skill) {
+      if (skill.type === 'main') {
+        stats.mainSkillsCompleted++;
+      } else if (skill.type === 'side') {
+        stats.sideSkillsCompleted++;
+      }
+    }
+  });
+  
+  // 3. 從後端獲取測驗記錄
+  try {
+    const quizRecordsResult = await makeRequest({
+      action: 'getQuizRecords',
+      userId: currentUser.userId
+    });
+    
+    if (quizRecordsResult.success && quizRecordsResult.records) {
+      // 計算滿分次數
+      stats.perfectQuizzes = quizRecordsResult.records.filter(r => r.score === 100).length;
+      
+      // 計算連續一次通過
+      let streak = 0;
+      let maxStreak = 0;
+      quizRecordsResult.records.forEach(record => {
+        if (record.attemptNumber === 1 && record.score === 100) {
+          streak++;
+          maxStreak = Math.max(maxStreak, streak);
+        } else {
+          streak = 0;
+        }
+      });
+      stats.firstTryStreak = maxStreak;
+    }
+  } catch (err) {
+    console.warn('⚠️ 無法載入測驗記錄:', err);
+  }
+  
+  // 4. 計算學習時段
+  const hour = new Date().getHours();
+  if (hour >= 0 && hour < 6) {
+    stats.lateNightLearning = 1;
+  } else if (hour >= 6 && hour < 9) {
+    stats.earlyMorningLearning = 1;
+  }
+  
+  // 5. 單日完成技能數（簡化版）
+  stats.skillsInOneDay = stats.completedCourses;
+  
+  return stats;
+}
+
+/**
+ * 🔥 檢查並解鎖成就
+ */
+async function checkAndUnlockAchievementsFixed() {
+  if (!currentUser) {
+    console.log('⚠️ 未登入，跳過成就檢查');
+    return;
+  }
+  
+  console.log('🏆 開始檢查成就...');
+  
+  try {
+    // 1. 計算實際統計資料
+    const stats = await calculateUserStats();
+    
+    console.log('📊 使用者統計:', stats);
+    
+    // 2. 調用後端檢查成就
+    const result = await makeRequest({
+      action: 'checkAndUnlockAchievements',
+      userId: currentUser.userId,
+      
+      // 傳遞實際的統計資料
+      completedCourses: stats.completedCourses,
+      streakDays: stats.streakDays,
+      perfectQuizzes: stats.perfectQuizzes,
+      firstTryStreak: stats.firstTryStreak,
+      mainSkillsCompleted: stats.mainSkillsCompleted,
+      sideSkillsCompleted: stats.sideSkillsCompleted,
+      skillsInOneDay: stats.skillsInOneDay,
+      lateNightLearning: stats.lateNightLearning,
+      earlyMorningLearning: stats.earlyMorningLearning
+    });
+    
+    if (result.success && result.newlyUnlocked && result.newlyUnlocked.length > 0) {
+      console.log(`🎉 解鎖了 ${result.newlyUnlocked.length} 個新成就！`);
+      
+      // 顯示成就通知
+      result.newlyUnlocked.forEach(achievement => {
+        showAchievementNotification(achievement);
+      });
+    } else {
+      console.log('ℹ️ 目前沒有新成就解鎖');
+    }
+    
+  } catch (error) {
+    console.error('❌ 檢查成就失敗:', error);
+  }
+}
+
+/**
+ * 🔥 顯示成就解鎖通知
+ */
+function showAchievementNotification(achievement) {
+  const notification = document.createElement('div');
+  notification.className = 'achievement-notification';
+  notification.innerHTML = `
+    <div class="achievement-notification-content">
+      <div class="achievement-notification-icon">${achievement.icon}</div>
+      <div class="achievement-notification-text">
+        <div class="achievement-notification-title">🎉 解鎖新成就！</div>
+        <div class="achievement-notification-name">${achievement.title}</div>
+        <div class="achievement-notification-reward">+${achievement.points} 成就點數</div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // 動畫效果
+  setTimeout(() => notification.classList.add('show'), 100);
+  
+  // 5 秒後移除
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 500);
+  }, 5000);
+}
+
     // 🔥 修正：完成技能
     function completeSkill() {
       const node = document.querySelector(`[data-id="${currentSkillId}"]`);
@@ -1810,26 +2050,7 @@ function drawConnections() {
 
         // 🔥 檢查並解鎖成就
         if (currentUser) {
-          makeRequest({
-            action: 'checkAndUnlockAchievements',
-            userId: currentUser.userId,
-            streakDays: 7, // 從實際資料讀取
-            perfectQuizzes: 0,
-            firstTryStreak: 0,
-            mainSkillsCompleted: 0,
-            sideSkillsCompleted: 0,
-            skillsInOneDay: 0,
-            lateNightLearning: 0,
-            earlyMorningLearning: 0
-          }).then(result => {
-            if (result.success && result.newlyUnlocked.length > 0) {
-              // 🔥 顯示解鎖的新成就
-              result.newlyUnlocked.forEach(achievement => {
-                console.log(`🏆 解鎖新成就: ${achievement.title}`);
-                // 可以加入彈出通知
-              });
-            }
-          });
+          checkAndUnlockAchievementsFixed();
         }
 
         // 🔥 修正：使用 updateSkillProgress 更新技能進度表
